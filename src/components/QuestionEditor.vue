@@ -8,14 +8,14 @@
             .field-body
                 .field
                     .control.is-expanded
-                        input.input(type="text" placeholder="Question" v-model="qName")
+                        input.input(type="text" placeholder="Question" v-model="name")
 
         .field.is-horizontal
             .field-label.is-normal
             .field-body
                 .field.has-text-left
                     label.checkbox
-                        input(type="checkbox" v-model="qIsRequired")
+                        input(type="checkbox" v-model="isRequired")
                         span is required
 
         .field.is-horizontal
@@ -25,8 +25,8 @@
                 .field.is-narrow
                     .control
                         .select.is-fullwidth
-                            select(v-model="qType" @change="typeChanged")
-                                option(v-for="(questionType, index) in questionTypes" :value="index") {{ questionType }}
+                            select(v-model="type" @change="typeChanged")
+                                option(v-for="(questionType, index) in questionTypes" :value="index + 1") {{ questionType }}
 
         .field.is-horizontal(v-if="isText")
             .field-label.is-normal
@@ -34,7 +34,7 @@
             .field-body
                 .field
                     .control.is-expanded
-                        input.input(type="number" placeholder="Maximum length" min="0" v-model.number="qParams.maxLength")
+                        input.input(type="number" placeholder="Maximum length" min="0" v-model.number="params.maxLength")
 
         .field.is-horizontal(v-if="isNumber || isScale")
             .field-label.is-normal
@@ -42,14 +42,14 @@
             .field-body
                  .field
                     .control.is-expanded
-                        input.input(type="number" placeholder="Min" :max="qParams.max" v-model.number="qParams.min")
+                        input.input(type="number" placeholder="Min" :max="params.max" v-model.number="params.min")
         .field.is-horizontal(v-if="isNumber || isScale")
             .field-label.is-normal
                 label.label Max
             .field-body
                 .field
                     .control.is-expanded
-                        input.input(type="number" placeholder="Max" :min="qParams.min" v-model.number="qParams.max")
+                        input.input(type="number" placeholder="Max" :min="params.min" v-model.number="params.max")
 
         .field.is-horizontal(v-if="isChoice")
             .field-label.is-normal
@@ -57,7 +57,7 @@
             .field-body
                 .field
                     .control(v-if="hasOptions")
-                        .field.is-grouped(v-for="(item, i) in qParams.items")
+                        .field.is-grouped(v-for="(item, i) in params.items")
                             button.button.is-danger.add-or-remove(@click="removeOption( i )") x
                             .option {{ (i + 1) + '.' }} {{ item }}
                     .info(v-else) No options, type some text into the box underneath and click '+' button to add.
@@ -74,21 +74,21 @@
             .field-body
                 .field
                     .control.is-expanded
-                        input.input(type="text" v-model="qParams.labelLeft")
+                        input.input(type="text" v-model="params.labelLeft")
         .field.is-horizontal(v-if="isScale")
             .field-label.is-normal
                 label.label Center label
             .field-body
                 .field
                     .control.is-expanded
-                        input.input(type="text" v-model="qParams.labelCenter")
+                        input.input(type="text" v-model="params.labelCenter")
         .field.is-horizontal(v-if="isScale")
             .field-label.is-normal
                 label.label Right label
             .field-body
                 .field
                     .control.is-expanded
-                        input.input(type="text" v-model="qParams.labelRight")
+                        input.input(type="text" v-model="params.labelRight")
 
         hr
         .buttons.is-right
@@ -113,69 +113,60 @@ import Question, {
   },
 })
 export default class QuestionEditor extends Vue {
-    @Prop()
-    public name!: string;
-
-    @Prop({default: QuestionType.None})
-    public type!: QuestionType;
-
-    @Prop({default: null})
-    public params!: QuestionAny;
-
-    public qName = '';
-    public qType = QuestionType.None;
-    public qIsRequired = true;
-    public qParams: Partial<QuestionParams> = {
+    public name = '';
+    public type = QuestionType.None;
+    public isRequired = true;
+    public params: QuestionParams = {
         maxLength: 100,
         min: 0,
         max: 100,
         isMultiple: false,
         items: [] as string[],
-        labelLeft: '',
+        labelLeft: 'min',
         labelCenter: '',
-        labelRight: '',
+        labelRight: 'max',
     };
 
-    public questionTypes = [ '', 'text', 'number', 'one choice', 'multiple choices', 'scale' ];
+    public questionTypes = [ 'text', 'number', 'one choice', 'multiple choices', 'scale' ];
     public maxLength = 0;
     public option = '';
 
     get isValidQuestion() {
         if (this.isChoice) {
-            return this.qName.length > 0 && this.qParams.items?.length;
+            return this.name.length > 0 && this.params.items?.length;
         }
         else {
-            return this.qName.length > 0 && this.qType !== 0;
+            return this.name.length > 0 && this.type !== 0;
         }
     }
 
     get hasOptions() {
-        return this.qParams.items?.length;
+        return this.params.items?.length;
     }
 
     get isText() {
-        return this.qType === QuestionType.Text;
+        return this.type === QuestionType.Text;
     }
 
     get isNumber() {
-        return this.qType === QuestionType.Number;
+        return this.type === QuestionType.Number;
     }
 
     get isChoice() {
-        return this.qType === QuestionType.ChoiceOne || this.qType === QuestionType.ChoiceMultiple;
+        return this.type === QuestionType.ChoiceOne || this.type === QuestionType.ChoiceMultiple;
     }
 
     get isScale() {
-        return this.qType === QuestionType.Scale;
+        return this.type === QuestionType.Scale;
     }
 
     addOption() {
-        (this.qParams as QuestionChoice).items.push( this.option );
+        this.params.items.push( this.option );
         this.option = '';
     }
 
     removeOption( index: number ) {
-        (this.qParams as QuestionChoice).items.splice( index, 1 );
+        this.params.items.splice( index, 1 );
     }
 
     create( type: QuestionType, params: Partial<QuestionAny> ) {
@@ -201,15 +192,15 @@ export default class QuestionEditor extends Vue {
                 throw new Error( 'Question: unknown type' );
         }
 
-        result.name = this.qName;
-        result.isRequired = this.qIsRequired;
-        result.type = this.qType;
+        result.name = this.name;
+        result.isRequired = this.isRequired;
+        result.type = this.type;
 
         return result;
     }
 
     save() {
-        this.$emit( 'save', this.create( this.qType, this.qParams ) );
+        this.$emit( 'save', this.create( this.type, this.params ) );
     }
 
     cancel() {
@@ -217,13 +208,13 @@ export default class QuestionEditor extends Vue {
     }
 
     typeChanged() {
-        console.log(this.qType);
-        switch (this.qType) {
+        console.log(this.type);
+        switch (this.type) {
             case QuestionType.ChoiceOne:
-                (this.qParams as QuestionChoice).isMultiple = false;
+                this.params.isMultiple = false;
                 break;
             case QuestionType.ChoiceMultiple:
-                (this.qParams as QuestionChoice).isMultiple = true;
+                this.params.isMultiple = true;
                 break;
         }
     }

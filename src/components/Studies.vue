@@ -7,7 +7,7 @@
                     button.button.study-item(@click="show(study)") {{ study.name }}
             .info(v-else) No studies
 
-            button.button.is-success(@click="createNew()") Create
+            button.button.is-success(@click="createNew()") Create new
 
             .questionnaires
                 questionnaires

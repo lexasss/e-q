@@ -11,7 +11,7 @@ export default class Questionnaire {
         return result;
     }
 
-    public id: number = 1000000 + Math.round( Math.random() * 8999999 );
+    public id: number = 200000000 + Math.round( Math.random() * 99999999 );
     public name: string;
     public items: Question[] = [];
     public study: number = 0;

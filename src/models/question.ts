@@ -7,8 +7,31 @@ export const enum QuestionType {
     Scale,
 }
 
+interface IQuestionText {
+    maxLength: number;
+}
+
+interface IQuestionNumber {
+    min: number;
+    max: number;
+}
+
+interface IQuestionChoice {
+    isMultiple: boolean;
+    items: string[];
+}
+
+interface IQuestionScale {
+    min: number;
+    max: number;
+
+    labelLeft: string;
+    labelCenter: string;
+    labelRight: string;
+}
+
 export type QuestionAny = QuestionText | QuestionNumber | QuestionChoice | QuestionScale;
-export type QuestionParams = QuestionText & QuestionNumber & QuestionChoice & QuestionScale;
+export type QuestionParams = IQuestionText & IQuestionNumber & IQuestionChoice & IQuestionScale;
 
 export type QuestionValueType = number | string | string[] | null;
 
@@ -35,7 +58,7 @@ export default class Question {
         }
     }
 
-    public id: number = 1000000 + Math.round( Math.random() * 8999999 );
+    public id: number = 100000000 + Math.round( Math.random() * 99999999 );
     public name: string = '';
     public isRequired: boolean = true;
     public type: QuestionType = QuestionType.None;
@@ -64,7 +87,7 @@ export default class Question {
     }
 }
 
-export  class QuestionText extends Question {
+export  class QuestionText extends Question implements IQuestionText {
     public maxLength: number = 100;
 
     constructor( ref: Partial<QuestionText> ) {
@@ -74,7 +97,7 @@ export  class QuestionText extends Question {
     }
 }
 
-export class QuestionNumber extends Question {
+export class QuestionNumber extends Question implements IQuestionNumber {
     public min: number = Number.MIN_SAFE_INTEGER;
     public max: number = Number.MAX_SAFE_INTEGER;
 
@@ -86,7 +109,7 @@ export class QuestionNumber extends Question {
     }
 }
 
-export class QuestionChoice extends Question {
+export class QuestionChoice extends Question implements IQuestionChoice {
     public isMultiple: boolean = false;
     public items: string[] = [];
 
@@ -98,7 +121,7 @@ export class QuestionChoice extends Question {
     }
 }
 
-export class QuestionScale extends Question {
+export class QuestionScale extends Question implements IQuestionScale {
     public min: number = 1;
     public max: number = 5;
 

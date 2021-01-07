@@ -12,6 +12,7 @@ export default class Participant {
         return result;
     }
 
+    public id = 400000000 + Math.round( Math.random() * 99999999 );
     public name: string;
     public questionnaires: Questionnaire[] = [];
 
