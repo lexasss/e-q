@@ -15,15 +15,19 @@ import Questionnaire from '@/models/questionnaire';
   },
 })
 export default class QuestionnaireItem extends Vue {
-    @Prop({default: null})
-    public questionnaire!: Questionnaire;
+    @Prop({default: 0})
+    public questionnaireId!: number;
+
+    public questionnaire: Questionnaire | null = null;
 
     remove(questionnaire: Questionnaire) {
         this.$emit('remove');
     }
 
-    mounted() {
-        // ok
+    created() {
+        this.questionnaire = this.$store.state.questionnaires.find( (item: Questionnaire) => {
+            return item.id === this.questionnaireId;
+        });
     }
 }
 </script>

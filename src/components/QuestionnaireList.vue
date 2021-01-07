@@ -1,8 +1,8 @@
 <template lang="pug">
-    .questionnaires
-        .list(v-if="items.length")
-            .field.is-grouped.item(v-for="item in items")
-                questionnaire-item(:questionnaire="item" @remove="remove(item)")
+    .questionnaire-list
+        .list(v-if="ids.length")
+            .field.is-grouped.item(v-for="id in ids")
+                questionnaire-item(:questionnaire-id="id" @remove="remove(id)")
         .info(v-else) No questionnaires, select some existing from the list below or create a new one. 
 
         .field.is-grouped
@@ -28,17 +28,17 @@ import Study from '@/models/study';
     },
 })
 export default class QuestionnaireList extends Vue {
-    @Prop({ default: () => new Array<Questionnaire>() })
-    public items!: Questionnaire[];
+    @Prop({ default: () => new Array<number>() })
+    public ids!: number[];
 
     @Prop({ default: 0 })
-    public studyID!: number;
+    public studyId!: number;
 
     public selectedQuestionnaire: Questionnaire | null = null;
 
     public get availableQuestionnaires() {
         return this.$store.state.questionnaires.filter( (item: Questionnaire) => {
-            return item.study === this.studyID || !item.study;
+            return item.study === this.studyId || !item.study;
         });
     }
 
@@ -48,9 +48,9 @@ export default class QuestionnaireList extends Vue {
         }
     }
 
-    remove(questionnaire: Questionnaire) {
-        const index = this.items.findIndex( item => item === questionnaire );
-        this.items.splice( index, 1 );
+    remove(questionnaireID: number) {
+        const index = this.ids.findIndex( id => id === questionnaireID );
+        this.ids.splice( index, 1 );
     }
 }
 </script>

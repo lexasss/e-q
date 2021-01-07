@@ -31,7 +31,7 @@
                         .control
                             button.button.is-warning(@click="close") Return
 
-        study-runner(v-else :participantName="participantName" :study="study" @finished="finished")
+        study-runner(v-else :participant-name="participantName" :study="study" @finished="finished")
 
         .modal(:class="{ 'is-active': isAskingName }")
             .modal-background
@@ -53,8 +53,10 @@ import StudyRunner from '@/components/StudyRunner.vue';
 
 import Study from '@/models/study';
 import Participant from '@/models/participant';
+import Questionnaire from '@/models/questionnaire';
 
 import IO from '@/services/io';
+import store from '@/services/storage';
 
 @Component({
     components: {
@@ -75,7 +77,9 @@ export default class StudyViewer extends Vue {
     }
 
     get questList() {
-        return this.study.questionnaires.map( item => item.name ).join(', ');
+        return this.study.questionnaires.map( id => {
+            return this.$store.state.questionnaires.find( (item: Questionnaire) => item.id === id)?.name ?? '--';
+        }).join(', ');
     }
 
     get isValidName() {

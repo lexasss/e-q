@@ -2,8 +2,8 @@
     .study-runner
         .questionnaire-viewer(v-for="(questionnaire, questIndex) in participant.questionnaires" :key="questionnaire.id")
             .questionnaire(v-if="questIndex === questionnaireIndex")
-                h5.subtitle.is-5 {{ questionnaire.name }}
-                .field.has-text-left(v-for="(q, i) in questionnaire.items" :key="q.id")
+                h5.subtitle.is-5 {{ getQuestionnaireName( questionnaire.id ) }}
+                .field.has-text-left(v-for="(q, i) in questionnaire.answers" :key="q.id")
                     label.label {{ (i + 1) + '.' }} {{ q.name }}
                         .is-required(v-if="q.isRequired") *
                     .control(v-if="isText( q.type )")
@@ -41,6 +41,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import Study from '@/models/study';
 import Participant from '@/models/participant';
 import { QuestionType } from '@/models/question';
+import Questionnaire from '@/models/questionnaire';
 
 @Component({
     components: {
@@ -53,16 +54,20 @@ export default class StudyRunner extends Vue {
     @Prop({default: ''})
     public participantName!: string;
 
-    public participant: Participant = new Participant( this.participantName, this.study );
+    public participant: Participant | null = null;
     public questionnaireIndex = 0;
 
     get hasEmptyRequired() {
-        const quest = this.participant.questionnaires[ this.questionnaireIndex ];
-        return quest.items.some( item => item.isRequired ? !item.isAnswered : false );
+        const quest = this.participant?.questionnaires[ this.questionnaireIndex ];
+        return quest?.answers.some( item => item.isRequired ? !item.isAnswered : false );
     }
 
     get nextButtonLabel() {
-        return this.questionnaireIndex < this.participant.questionnaires.length - 1 ? 'Next' : 'Finish';
+        return this.questionnaireIndex < (this.participant?.questionnaires.length ?? 0) - 1 ? 'Next' : 'Finish';
+    }
+
+    getQuestionnaireName( id: number ) {
+        return this.$store.state.questionnaires.find( (item: Questionnaire) => item.id === id)?.name ?? '-';
     }
 
     isText(type: QuestionType) {
@@ -94,7 +99,7 @@ export default class StudyRunner extends Vue {
     }
 
     next() {
-        if (this.questionnaireIndex < this.participant.questionnaires.length - 1) {
+        if (this.questionnaireIndex < (this.participant?.questionnaires.length ?? 0) - 1) {
             this.questionnaireIndex++;
         }
         else {
@@ -107,11 +112,10 @@ export default class StudyRunner extends Vue {
     }
 
     created() {
-        // ok
-    }
-
-    mounted() {
-        // ok
+        const questionnaires = this.study.questionnaires.map( id => {
+            return this.$store.state.questionnaires.find( (item: Questionnaire) => item.id === id );
+        });
+        this.participant = new Participant( this.participantName, questionnaires );
     }
 }
 </script>

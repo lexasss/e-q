@@ -9,7 +9,7 @@
                 .field-body
                     .field
                         .control.is-expanded
-                            input.input(type="text" placeholder="Questionnaire name" v-model="qQuestionnaire.name")
+                            input.input(type="text" placeholder="Questionnaire name" v-model="questionnaire.name")
 
             .field.is-horizontal
                 .field-label.is-normal
@@ -24,8 +24,8 @@
                     label.label Questions
                 .field-body
                     .field
-                        .control(v-if="qQuestionnaire.items.length")
-                            .field.is-grouped.questions(v-for="(item, index) in qQuestionnaire.items")
+                        .control(v-if="questionnaire.items.length")
+                            .field.is-grouped.questions(v-for="(item, index) in questionnaire.items")
                                 button.button.is-danger.add-or-remove(@click="remove(item)") x
                                 .question.is-expanded {{ index + 1 }}. {{ item.name }}
                                 .required(v-show="item.isRequired") *
@@ -55,32 +55,29 @@ import Question from '@/models/question';
       'question-editor': QuestionEditor,
   },
 })
-export default class StudyEditor extends Vue {
-    @Prop({default: null})
-    public questionnaire!: Questionnaire;
-
+export default class QuestionnaireEditor extends Vue {
     @Prop({default: 0})
-    public studyID!: number;
+    public studyId!: number;
 
-    public qQuestionnaire = new Questionnaire('');
+    public questionnaire = new Questionnaire('');
 
     public isAddingQuestion = false;
 
     public get isValidQuestionnaire() {
-        return this.qQuestionnaire.isValid;
+        return this.questionnaire.isValid;
     }
 
     get isPublic() {
-        return this.qQuestionnaire.study === 0;
+        return this.questionnaire.study === 0;
     }
 
     set isPublic( value: boolean ) {
-        this.qQuestionnaire.study = value ? 0 : this.studyID;
+        this.questionnaire.study = value ? 0 : this.studyId;
     }
 
     addQuestion( question: Question ) {
         this.isAddingQuestion = false;
-        this.qQuestionnaire.items.push( question );
+        this.questionnaire.items.push( question );
     }
 
     hideEditor() {
@@ -92,25 +89,19 @@ export default class StudyEditor extends Vue {
     }
 
     remove( question: Question ) {
-        const index = this.qQuestionnaire.items.findIndex( item => item === question );
-        this.qQuestionnaire.items.splice( index, 1 );
+        const index = this.questionnaire.items.findIndex( item => item === question );
+        this.questionnaire.items.splice( index, 1 );
     }
 
     save() {
-        this.$store.commit( 'addQuestionnaire', this.qQuestionnaire );
+        this.$store.commit( 'addQuestionnaire', this.questionnaire );
         this.$store.dispatch( 'save' );
 
-        this.$emit( 'save', this.qQuestionnaire );
+        this.$emit( 'save', this.questionnaire );
     }
 
     cancel() {
         this.$emit( 'cancel' );
-    }
-
-    created() {
-        if (this.questionnaire) {
-            this.qQuestionnaire.copyFrom( this.questionnaire );
-        }
     }
 }
 </script>

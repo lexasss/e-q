@@ -9,7 +9,7 @@ export default class Study {
         result.id = ref.id ?? result.id;
         result.name = ref.name ?? result.name;
         result.questionnaires = ref.questionnaires
-            ? ref.questionnaires.map( item => Questionnaire.from( item ) )
+            ? ref.questionnaires.map( item => item )
             : result.questionnaires;
         result.participants = ref.participants
             ? ref.participants.map( item => Participant.from( item ) )
@@ -20,7 +20,7 @@ export default class Study {
 
     public id: number = 300000000 + Math.round( Math.random() * 99999999 );
     public name: string = '';
-    public questionnaires: Questionnaire[] = [];
+    public questionnaires: number[] = [];
     public participants: Participant[] = [];
 
     public get isValid() {
@@ -33,7 +33,7 @@ export default class Study {
             name: p.name,
             results: p.questionnaires.map( quest => { return {
                 questionnaire: quest.name,
-                answers: quest.items.map( q => { return {
+                answers: quest.answers.map( q => { return {
                     question: q.id,
                     text: q.name,
                     answer: q.value,

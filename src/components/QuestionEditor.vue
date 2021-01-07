@@ -208,7 +208,6 @@ export default class QuestionEditor extends Vue {
     }
 
     typeChanged() {
-        console.log(this.type);
         switch (this.type) {
             case QuestionType.ChoiceOne:
                 this.params.isMultiple = false;

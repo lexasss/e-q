@@ -35,7 +35,7 @@ export default class Questionnaires extends Vue {
     isNotUsed( quest: Questionnaire ) {
         if (quest.study === 0) {
             return !this.$store.state.studies.some( (item: Study) => {
-                return item.questionnaires.some( q => q.id === quest.id );
+                return item.questionnaires.some( id => id === quest.id );
             });
         }
         else {

@@ -17,7 +17,7 @@
                 .field-body
                     .field
                         .control.is-expanded
-                            questionnaire-list(:studyID="study.id" :items="study.questionnaires" @add="addQuestionnaire")
+                            questionnaire-list(:study-id="study.id" :ids="study.questionnaires" @add="addQuestionnaire")
             
             .field.is-horizontal
                 .field-label.is-normal
@@ -32,7 +32,7 @@
                 button.button.is-rounded.is-danger(@click="cancel()") Cancel
 
         div(v-else)
-            questionnaire-editor(:studyID="study.id" @save="addQuestionnaire" @cancel="hideEditor")
+            questionnaire-editor(:study-id="study.id" @save="addQuestionnaire" @cancel="hideEditor")
 </template>
 
 <script lang="ts">
@@ -66,7 +66,7 @@ export default class StudyEditor extends Vue {
 
     addQuestionnaire(questionnaire: Questionnaire) {
         this.isAddingQuestionnaire = false;
-        this.study.questionnaires.push( questionnaire );
+        this.study.questionnaires.push( questionnaire.id );
     }
 
     hideEditor() {
@@ -79,10 +79,6 @@ export default class StudyEditor extends Vue {
 
     cancel() {
         this.$emit( 'cancel' );
-    }
-
-    created() {
-        this.study.questionnaires.forEach( q => console.log(q.name));
     }
 }
 </script>
