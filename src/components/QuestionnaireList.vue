@@ -3,7 +3,7 @@
         .list(v-if="ids.length")
             .field.is-grouped.item(v-for="id in ids")
                 questionnaire-item(:questionnaire-id="id" @remove="remove(id)")
-        .info(v-else) No questionnaires, select some existing from the list below or create a new one. 
+        .no-items(v-else) No questionnaires, select some existing from the list below or create a new one. 
 
         .field.is-grouped
             .control.is-expanded
@@ -68,7 +68,7 @@ select {
     }
 }
 
-.info {
+.no-items {
     font-style: italic;
     font-size: 0.75em;
     line-height: 2.5rem;

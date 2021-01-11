@@ -29,7 +29,7 @@
                                 button.button.is-danger.add-or-remove(@click="remove(item)") x
                                 .question.is-expanded {{ index + 1 }}. {{ item.name }}
                                 .required(v-show="item.isRequired") *
-                        .control.info(v-else) No questions, click '+' button to add some.
+                        .control.no-items(v-else) No questions, click '+' button to add some.
                         .field.is-grouped
                             button.button.is-success.add-or-remove(@click="createNew()") +
 
@@ -130,7 +130,7 @@ button.add-or-remove {
     text-align: left;
 }
 
-.info {
+.no-items {
     font-style: italic;
     font-size: 0.75em;
     line-height: 2.5rem;

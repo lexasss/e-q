@@ -2,12 +2,12 @@
     v-app#app
         v-app-bar.headline(app color="primary" dark v-show="!isRunningStudy")
             div.d-flex.align-center
-                v-img.shrink.mr-2(alt="E-Q Logo" contain src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png" transition="scale-transition" width="40")
-                h1.shrink.mt-1.hidden-sm-and-down.header E-Q
+                v-img.shrink.mr-2(alt="E-Q Logo" contain src="@/assets/logo.png" transition="scale-transition" width="40")
+                h1.shrink.mt-1.hidden-sm-and-down.app-name E-Q
 
             v-spacer
 
-            h2.is-5 offline questionnaire
+            h2.app-subname offline questionnaire
 
         v-main
             section.section
@@ -82,5 +82,13 @@ export default class App extends Vue {
 
 .headline {
     color: hsl(0, 0, 90) !important;
+}
+
+.app-name {
+    font-size: 1.5em;
+}
+
+.app-subname {
+    font-size: 0.75em;
 }
 </style>

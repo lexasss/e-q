@@ -23,8 +23,8 @@
                         .scale-items
                             .scale-items-row
                                 .scale-as-slider(v-if="q.hasSlider")
-                                    
-                                .scale-as-options(v-else)
+                                    v-slider(:min="q.min" :max="q.max" v-model="q.value" ticks="always" tick-size="4" thumb-label)
+                                .scale-as-options.is-flex(v-else)
                                     .scale-item(v-for="option in range(q.min, q.max)")
                                         input(type="radio" :value="option" v-model="q.value")
                         .scale-labels
@@ -159,13 +159,17 @@ export default class StudyRunner extends Vue {
 }
 
 .scale-items-row {
-    width: 100%;
     display: flex;
-    justify-content: space-between;
     padding: 0.25em 0; 
 }
 
-.scale-item {
-    display: flex;
+.scale-as-slider {
+    width: 100%;
+    justify-content: space-between;
+}
+
+.scale-as-options {
+    width: 100%;
+    justify-content: space-between;
 }
 </style>

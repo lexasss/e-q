@@ -8,7 +8,7 @@
                     .name {{ quest.name }}
                     .study(:class="{ 'is-not-used': isNotUsed(quest) }") [{{ studies(quest) }}]
                     button.button.is-danger(v-if="isNotUsed(quest)" @click="del(quest)") x
-        .info(v-else) No questionnaires
+        .no-items(v-else) No questionnaires
 </template>
 
 <script lang="ts">
@@ -70,7 +70,7 @@ export default class Questionnaires extends Vue {
     margin: 1em;
 }
 
-.info {
+.no-items {
     font-style: italic;
     font-size: 0.75em;
     line-height: 2.5rem;

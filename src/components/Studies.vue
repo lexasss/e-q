@@ -5,7 +5,7 @@
             .list(v-if="!!$store.state.studies.length")
                 .item(v-for="study in $store.state.studies")
                     button.button.study-item(@click="show(study)") {{ study.name }}
-            .info(v-else) No studies
+            .no-items(v-else) No studies
 
             button.button.is-success(@click="createNew()") Create new
 
@@ -85,7 +85,7 @@ export default class Studies extends Vue {
     width: 100%;
 }
 
-.info {
+.no-items {
     font-style: italic;
     font-size: 0.75em;
     line-height: 2.5rem;

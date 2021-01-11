@@ -60,7 +60,7 @@
                         .field.is-grouped(v-for="(item, i) in params.items")
                             button.button.is-danger.add-or-remove(@click="removeOption( i )") x
                             .option {{ (i + 1) + '.' }} {{ item }}
-                    .info(v-else) No options, type some text into the box underneath and click '+' button to add.
+                    .no-items(v-else) No options, type some text into the box underneath and click '+' button to add.
 
                     .field.has-addons
                         .control.is-expanded
@@ -68,27 +68,35 @@
                         .control
                             button.button.is-success(@click="addOption") +
 
-        .field.is-horizontal(v-if="isScale")
-            .field-label.is-normal
-                label.label Left label
-            .field-body
-                .field
-                    .control.is-expanded
-                        input.input(type="text" v-model="params.labelLeft")
-        .field.is-horizontal(v-if="isScale")
-            .field-label.is-normal
-                label.label Center label
-            .field-body
-                .field
-                    .control.is-expanded
-                        input.input(type="text" v-model="params.labelCenter")
-        .field.is-horizontal(v-if="isScale")
-            .field-label.is-normal
-                label.label Right label
-            .field-body
-                .field
-                    .control.is-expanded
-                        input.input(type="text" v-model="params.labelRight")
+        template(v-if="isScale")
+            .field.is-horizontal
+                .field-label.is-normal
+                    label.label Left label
+                .field-body
+                    .field
+                        .control.is-expanded
+                            input.input(type="text" v-model="params.labelLeft")
+            .field.is-horizontal
+                .field-label.is-normal
+                    label.label Center label
+                .field-body
+                    .field
+                        .control.is-expanded
+                            input.input(type="text" v-model="params.labelCenter")
+            .field.is-horizontal
+                .field-label.is-normal
+                    label.label Right label
+                .field-body
+                    .field
+                        .control.is-expanded
+                            input.input(type="text" v-model="params.labelRight")
+            .field.is-horizontal
+                .field-label.is-normal
+                .field-body
+                    label.checkbox
+                        input(type="checkbox" v-model="params.hasSlider")
+                        span show as a slider
+
 
         hr
         .buttons.is-right
@@ -238,7 +246,7 @@ input[type="checkbox"] {
     text-align: left;
 }
 
-.info {
+.no-items {
     font-style: italic;
     font-size: 0.75em;
     line-height: 2.5rem;

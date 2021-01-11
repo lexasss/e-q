@@ -142,5 +142,7 @@ export class QuestionScale extends Question implements IQuestionScale {
         this.labelLeft = ref.labelLeft ?? this.labelLeft;
         this.labelCenter = ref.labelCenter ?? this.labelCenter;
         this.labelRight = ref.labelRight ?? this.labelRight;
+
+        this.hasSlider = ref.hasSlider ?? this.hasSlider;
     }
 }
