@@ -18,6 +18,7 @@ interface IQuestionNumber {
 
 interface IQuestionChoice {
     isMultiple: boolean;
+    asDropdownList: boolean;
     items: string[];
 }
 
@@ -60,10 +61,10 @@ export default class Question {
         }
     }
 
-    public id: number = 100000000 + Math.round( Math.random() * 99999999 );
-    public name: string = '';
-    public isRequired: boolean = true;
-    public type: QuestionType = QuestionType.None;
+    public id = 100000000 + Math.round( Math.random() * 99999999 );
+    public name = '';
+    public isRequired = true;
+    public type = QuestionType.None;
 
     public value: QuestionValueType = null;
 
@@ -90,7 +91,7 @@ export default class Question {
 }
 
 export  class QuestionText extends Question implements IQuestionText {
-    public maxLength: number = 100;
+    public maxLength = 100;
 
     constructor( ref: Partial<QuestionText> ) {
         super( ref );
@@ -100,8 +101,8 @@ export  class QuestionText extends Question implements IQuestionText {
 }
 
 export class QuestionNumber extends Question implements IQuestionNumber {
-    public min: number = Number.MIN_SAFE_INTEGER;
-    public max: number = Number.MAX_SAFE_INTEGER;
+    public min = Number.MIN_SAFE_INTEGER;
+    public max = Number.MAX_SAFE_INTEGER;
 
     constructor( ref: Partial<QuestionNumber> ) {
         super( ref );
@@ -112,20 +113,22 @@ export class QuestionNumber extends Question implements IQuestionNumber {
 }
 
 export class QuestionChoice extends Question implements IQuestionChoice {
-    public isMultiple: boolean = false;
+    public isMultiple = false;
+    public asDropdownList = false;
     public items: string[] = [];
 
     constructor( ref: Partial<QuestionChoice> ) {
         super( ref );
 
         this.isMultiple = ref.isMultiple ?? this.isMultiple;
+        this.asDropdownList = ref.asDropdownList ?? this.asDropdownList;
         this.items = ref.items ?? this.items;
     }
 }
 
 export class QuestionScale extends Question implements IQuestionScale {
-    public min: number = 1;
-    public max: number = 5;
+    public min = 1;
+    public max = 5;
 
     public labelLeft = '';
     public labelCenter = '';

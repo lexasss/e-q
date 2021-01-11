@@ -51,22 +51,29 @@
                     .control.is-expanded
                         input.input(type="number" placeholder="Max" :min="params.min" v-model.number="params.max")
 
-        .field.is-horizontal(v-if="isChoice")
-            .field-label.is-normal
-                label.label Options
-            .field-body
-                .field
-                    .control(v-if="hasOptions")
-                        .field.is-grouped(v-for="(item, i) in params.items")
-                            button.button.is-danger.add-or-remove(@click="removeOption( i )") x
-                            .option {{ (i + 1) + '.' }} {{ item }}
-                    .no-items(v-else) No options, type some text into the box underneath and click '+' button to add.
+        template(v-if="isChoice")
+            .field.is-horizontal
+                .field-label.is-normal
+                    label.label Options
+                .field-body
+                    .field
+                        .control(v-if="hasOptions")
+                            .field.is-grouped(v-for="(item, i) in params.items")
+                                button.button.is-danger.add-or-remove(@click="removeOption( i )") x
+                                .option {{ (i + 1) + '.' }} {{ item }}
+                        .no-items(v-else) No options, type some text into the box underneath and click '+' button to add.
 
-                    .field.has-addons
-                        .control.is-expanded
-                            input.input(type="text" v-model="option")
-                        .control
-                            button.button.is-success(@click="addOption") +
+                        .field.has-addons
+                            .control.is-expanded
+                                input.input(type="text" v-model="option")
+                            .control
+                                button.button.is-success(@click="addOption" :disabled="option === ''") +
+            .field.is-horizontal
+                .field-label.is-normal
+                .field-body
+                    label.checkbox
+                        input(type="checkbox" v-model="params.asDropdownList" :disabled="params.isMultiple")
+                        span show as a drop-down list
 
         template(v-if="isScale")
             .field.is-horizontal
@@ -129,6 +136,7 @@ export default class QuestionEditor extends Vue {
         min: 0,
         max: 100,
         isMultiple: false,
+        asDropdownList: false,
         items: [] as string[],
         labelLeft: 'min',
         labelCenter: '',

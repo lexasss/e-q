@@ -12,25 +12,30 @@
                     .control(v-else-if="isNumber( q.type )")
                         input.input(type="number" :min="q.min" :max="q.max" v-model.number="q.value")
                     .control(v-else-if="isChoiceOne( q.type )")
-                        .field.answer-item(v-for="option in q.items")
-                            input(type="radio" :id="q.id + '-' + option" :value="option" v-model="q.value")
-                            label.item-label(:for="q.id + '-' + option") {{ option }}
+                        .field(v-if="q.asDropdownList")
+                            .select
+                                select(v-model="q.value")
+                                    option(v-for="option in q.items" :value="option") {{ option }}
+                        .field(v-else)
+                            .answer-item(v-for="option in q.items")
+                                input(type="radio" :id="q.id + '-' + option" :value="option" v-model="q.value")
+                                label.item-label(:for="q.id + '-' + option") {{ option }}
                     .control(v-else-if="isChoiceMultiple( q.type )")
                         .field.answer-item(v-for="option in q.items")
                             input(type="checkbox" :id="q.id + '-' + option" :value="option" v-model="q.value")
                             label.item-label(:for="q.id + '-' + option") {{ option }}
                     .control(v-else-if="isScale( q.type )")
                         .scale-items
-                            .scale-items-row
+                            .scale-items-row(:style="getScaleWidth(q.min, q.max)")
                                 .scale-as-slider(v-if="q.hasSlider")
                                     v-slider(:min="q.min" :max="q.max" v-model="q.value" ticks="always" tick-size="4" thumb-label)
                                 .scale-as-options.is-flex(v-else)
                                     .scale-item(v-for="option in range(q.min, q.max)")
                                         input(type="radio" :value="option" v-model="q.value")
-                        .scale-labels
-                            .scale-label {{ q.labelLeft }}
-                            .scale-label {{ q.labelCenter }}
-                            .scale-label {{ q.labelRight }}
+                            .scale-labels(:style="getScaleWidth(q.min, q.max)")
+                                .scale-label {{ q.labelLeft }}
+                                .scale-label {{ q.labelCenter }}
+                                .scale-label {{ q.labelRight }}
                 .field.is-grouped.is-align-items-stretch
                     .control
                         button.button.is-info(:disabled="hasEmptyRequired" @click="next()") {{ nextButtonLabel }}
@@ -101,6 +106,10 @@ export default class StudyRunner extends Vue {
         return result;
     }
 
+    getScaleWidth( min: number, max: number ) {
+        return `width: ${32 * (max - min + 1)}px`;
+    }
+
     next() {
         if (this.questionnaireIndex < (this.participant?.questionnaires.length ?? 0) - 1) {
             this.questionnaireIndex++;
@@ -124,6 +133,11 @@ export default class StudyRunner extends Vue {
 </script>
 
 <style scoped lang="less">
+.study-runner {
+    max-width: 920px;
+    margin: 0 auto;
+}
+
 .is-required {
     display: inline;
     color: red;
@@ -142,18 +156,7 @@ export default class StudyRunner extends Vue {
     width: 100%;
 }
 
-.scale-labels {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-}
-
-.scale-label {
-    display: flex;
-}
-
 .scale-items {
-    width: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -161,6 +164,19 @@ export default class StudyRunner extends Vue {
 .scale-items-row {
     display: flex;
     padding: 0.25em 0; 
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+.scale-labels {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+.scale-label {
+    display: flex;
 }
 
 .scale-as-slider {
@@ -171,5 +187,9 @@ export default class StudyRunner extends Vue {
 .scale-as-options {
     width: 100%;
     justify-content: space-between;
+}
+
+select {
+    min-width: 11em;
 }
 </style>
