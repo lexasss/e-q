@@ -28,6 +28,8 @@ interface IQuestionScale {
     labelLeft: string;
     labelCenter: string;
     labelRight: string;
+
+    hasSlider: boolean;
 }
 
 export type QuestionAny = QuestionText | QuestionNumber | QuestionChoice | QuestionScale;
@@ -128,6 +130,8 @@ export class QuestionScale extends Question implements IQuestionScale {
     public labelLeft = '';
     public labelCenter = '';
     public labelRight = '';
+
+    public hasSlider = false;
 
     constructor( ref: Partial<QuestionScale> ) {
         super( ref );

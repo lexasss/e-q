@@ -1,13 +1,18 @@
 <template lang="pug">
-  #app
-    section.hero.is-primary(v-show="!isRunningStudy")
-        .hero-body
-            .container.header
-                h1.title E-Q
-                h2.subtitle.is-5 offline questionnaire
-    section.section
-        .container
-            studies
+    v-app#app
+        v-app-bar.headline(app color="primary" dark v-show="!isRunningStudy")
+            div.d-flex.align-center
+                v-img.shrink.mr-2(alt="E-Q Logo" contain src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png" transition="scale-transition" width="40")
+                h1.shrink.mt-1.hidden-sm-and-down.header E-Q
+
+            v-spacer
+
+            h2.is-5 offline questionnaire
+
+        v-main
+            section.section
+                .container
+                    studies
 </template>
 
 <script lang="ts">
@@ -73,5 +78,9 @@ export default class App extends Vue {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
+}
+
+.headline {
+    color: hsl(0, 0, 90) !important;
 }
 </style>

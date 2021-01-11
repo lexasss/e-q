@@ -125,6 +125,7 @@ export default class QuestionEditor extends Vue {
         labelLeft: 'min',
         labelCenter: '',
         labelRight: 'max',
+        hasSlider: false,
     };
 
     public questionTypes = [ 'text', 'number', 'one choice', 'multiple choices', 'scale' ];

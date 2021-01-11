@@ -22,8 +22,11 @@
                     .control(v-else-if="isScale( q.type )")
                         .scale-items
                             .scale-items-row
-                                .scale-item(v-for="option in range(q.min, q.max)")
-                                    input(type="radio" :value="option" v-model="q.value")
+                                .scale-as-slider(v-if="q.hasSlider")
+                                    
+                                .scale-as-options(v-else)
+                                    .scale-item(v-for="option in range(q.min, q.max)")
+                                        input(type="radio" :value="option" v-model="q.value")
                         .scale-labels
                             .scale-label {{ q.labelLeft }}
                             .scale-label {{ q.labelCenter }}
