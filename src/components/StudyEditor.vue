@@ -13,6 +13,14 @@
 
             .field.is-horizontal
                 .field-label.is-normal
+                    label.label Description
+                .field-body
+                    .field
+                        .control.is-expanded
+                            textarea.textarea(placeholder="Study description" v-model="study.description")
+
+            .field.is-horizontal
+                .field-label.is-normal
                     label.label Questionnaires
                 .field-body
                     .field

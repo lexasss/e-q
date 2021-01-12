@@ -2,7 +2,9 @@
     .study-runner
         .questionnaire-viewer(v-for="(questionnaire, questIndex) in participant.questionnaires" :key="questionnaire.id")
             .questionnaire(v-if="questIndex === questionnaireIndex")
-                h5.subtitle.is-5 {{ getQuestionnaireName( questionnaire.id ) }}
+                h5.subtitle.is-5 {{ name( questionnaire.id ) }}
+                h6.subtitle.is-6.has-text-left {{ description( questionnaire.id ) }}
+
                 .field.has-text-left(v-for="(q, i) in questionnaire.answers" :key="q.id")
                     label.label {{ (i + 1) + '.' }} {{ q.name }}
                         .is-required(v-if="q.isRequired") *
@@ -36,6 +38,7 @@
                                 .scale-label {{ q.labelLeft }}
                                 .scale-label {{ q.labelCenter }}
                                 .scale-label {{ q.labelRight }}
+
                 .field.is-grouped.is-align-items-stretch
                     .control
                         button.button.is-info(:disabled="hasEmptyRequired" @click="next()") {{ nextButtonLabel }}
@@ -74,8 +77,16 @@ export default class StudyRunner extends Vue {
         return this.questionnaireIndex < (this.participant?.questionnaires.length ?? 0) - 1 ? 'Next' : 'Finish';
     }
 
-    getQuestionnaireName( id: number ) {
-        return this.$store.state.questionnaires.find( (item: Questionnaire) => item.id === id)?.name ?? '-';
+    name( id: number ) {
+        return (this.$store.state.questionnaires.find( (item: Questionnaire) => {
+            return item.id === id;
+        }) as Questionnaire).name;
+    }
+
+    description( id: number ) {
+        return (this.$store.state.questionnaires.find( (item: Questionnaire) => {
+            return item.id === id;
+        }) as Questionnaire).description;
     }
 
     isText(type: QuestionType) {
@@ -125,8 +136,12 @@ export default class StudyRunner extends Vue {
 
     created() {
         const questionnaires = this.study.questionnaires.map( id => {
-            return this.$store.state.questionnaires.find( (item: Questionnaire) => item.id === id );
+            const questionnaire = this.$store.state.questionnaires.find( (item: Questionnaire) => {
+                return item.id === id;
+            }) as Questionnaire;
+            return questionnaire;
         });
+
         this.participant = new Participant( this.participantName, questionnaires );
     }
 }

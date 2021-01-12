@@ -5,6 +5,13 @@
         template(v-if="!isRunning")
             .field.is-horizontal
                 .field-label
+                    .label.label Description:
+                .field-body
+                    .field
+                        .control.is-expanded
+                            .has-text-left {{ study.description }}
+            .field.is-horizontal
+                .field-label
                     .label.label Questionnaires:
                 .field-body
                     .field
@@ -78,7 +85,10 @@ export default class StudyViewer extends Vue {
 
     get questList() {
         return this.study.questionnaires.map( id => {
-            return this.$store.state.questionnaires.find( (item: Questionnaire) => item.id === id)?.name ?? '--';
+            const questionnaire = this.$store.state.questionnaires.find( (item: Questionnaire) => {
+                return item.id === id;
+            }) as Questionnaire;
+            return questionnaire?.name ?? '--';
         }).join(', ');
     }
 

@@ -65,14 +65,6 @@ export default class Studies extends Vue {
     hide() {
         this.study = null;
     }
-
-    created() {
-        // ok
-    }
-
-    mounted() {
-        // ok
-    }
 }
 </script>
 

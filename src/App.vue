@@ -1,18 +1,17 @@
 <template lang="pug">
     v-app#app
-        v-app-bar.headline(app color="primary" dark v-show="!isRunningStudy")
+        v-app-bar(app color="primary" dark v-show="!isRunningStudy")
             div.d-flex.align-center
-                v-img.shrink.mr-2(alt="E-Q Logo" contain src="@/assets/logo.png" transition="scale-transition" width="40")
-                h1.shrink.mt-1.hidden-sm-and-down.app-name E-Q
+                v-img.shrink.mr-3(alt="E-Q Logo" contain src="@/assets/logo.png" transition="scale-transition" width="40")
+                v-toolbar-title E-Q
 
             v-spacer
 
-            h2.app-subname offline questionnaire
+            v-subheader offline questionnaire
 
         v-main
-            section.section
-                .container
-                    studies
+            v-container(fluid)
+                studies
 </template>
 
 <script lang="ts">
@@ -74,21 +73,8 @@ export default class App extends Vue {
 
 <style lang="less">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-}
-
-.headline {
-    color: hsl(0, 0, 90) !important;
-}
-
-.app-name {
-    font-size: 1.5em;
-}
-
-.app-subname {
-    font-size: 0.75em;
 }
 </style>

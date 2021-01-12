@@ -13,6 +13,14 @@
 
             .field.is-horizontal
                 .field-label.is-normal
+                    label.label Description
+                .field-body
+                    .field
+                        .control.is-expanded
+                            textarea.textarea(placeholder="Questionnaire description" v-model="questionnaire.description")
+
+            .field.is-horizontal
+                .field-label.is-normal
                 .field-body
                     .field.has-text-left
                         label.checkbox

@@ -5,18 +5,20 @@ export default class Questionnaire {
         const result = new Questionnaire( ref.name ?? '' );
 
         result.id = ref.id ?? result.id;
+        result.description = ref.description ?? result.description;
         result.items = ref.items ? ref.items.map( item => Question.from( item )) : result.items;
         result.study = ref.study ?? result.study;
 
         return result;
     }
 
-    public id: number = 200000000 + Math.round( Math.random() * 99999999 );
+    public id = 200000000 + Math.round( Math.random() * 99999999 );
     public name: string;
+    public description = '';
     public items: Question[] = [];
-    public study: number = 0;
+    public study = 0;
 
-    constructor(name: string) {
+    constructor( name: string ) {
         this.name = name;
     }
 
@@ -24,9 +26,10 @@ export default class Questionnaire {
         return this.items.length > 0 && this.name.length > 2;
     }
 
-    public copyFrom(ref: Questionnaire) {
+    public copyFrom( ref: Questionnaire ) {
         this.id = ref.id ?? this.id;
         this.name = ref.name;
+        this.description = ref.description;
         ref.items.forEach( item => this.items.push( item ));
         this.study = this.study;
     }

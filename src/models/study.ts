@@ -8,6 +8,7 @@ export default class Study {
 
         result.id = ref.id ?? result.id;
         result.name = ref.name ?? result.name;
+        result.description = ref.description ?? result.description;
         result.questionnaires = ref.questionnaires
             ? ref.questionnaires.map( item => item )
             : result.questionnaires;
@@ -18,8 +19,9 @@ export default class Study {
         return result;
     }
 
-    public id: number = 300000000 + Math.round( Math.random() * 99999999 );
-    public name: string = '';
+    public id = 300000000 + Math.round( Math.random() * 99999999 );
+    public name = '';
+    public description = '';
     public questionnaires: number[] = [];
     public participants: Participant[] = [];
 
