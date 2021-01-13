@@ -1,14 +1,17 @@
 <template lang="pug">
     .questionnaire-list
         .mb-2.text-left(v-if="ids.length")
-            v-chip.ma-2(
-                v-for="(id, index) in ids"
-                :key="index"
-                close
-                color="primary"
-                outlined
-                :class="{ 'font-italic': isPrivate(id) }"
-                @click:close="remove(id)") {{ getName(id) }}
+            v-chip-group(column)
+                draggable(:list="ids" @change="onSwapped")
+                    v-chip.ma-2(
+                        v-for="(id, index) in ids"
+                        :key="index"
+                        close
+                        draggable
+                        color="primary"
+                        outlined
+                        :class="{ 'font-italic': isPrivate(id) }"
+                        @click:close="remove(id)") {{ getName(id) }}
         v-subheader.red--text(v-else) No questionnaires, select some existing from the list below or create a new one. 
 
         .d-flex
@@ -24,6 +27,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import draggable from 'vuedraggable';
 
 import Questionnaire from '@/models/questionnaire';
 import Study from '@/models/study';
@@ -31,9 +35,11 @@ import Study from '@/models/study';
 
 @Component({
     components: {
+        draggable,
     },
 })
 export default class QuestionnaireList extends Vue {
+
     @Prop({ default: () => new Array<number>() })
     public ids!: number[];
 
@@ -73,6 +79,14 @@ export default class QuestionnaireList extends Vue {
     remove( questID: number ) {
         const index = this.ids.findIndex( id => id === questID );
         this.ids.splice( index, 1 );
+    }
+
+    onSwapped( event: any ) {
+        if (event.moved) {
+            const temp = this.ids[ event.oldIndex ];
+            this.ids[ event.oldIndex ] = this.ids[ event.newIndex ];
+            this.ids[ event.newIndex ] = temp;
+        }
     }
 }
 </script>

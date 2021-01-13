@@ -15,20 +15,26 @@
                     v-col.text-left {{ study.participants.length }}
                 v-row
                     v-col(md="2").text-subtitle-1.font-weight-bold.text-right
-                    v-col.text-left
-                        v-btn.mr-2(
-                            color="primary"
-                            @click="askName") Run
-                        v-btn.mr-2(
-                            color="primary"
-                            @click="save") Save to file
-                        v-btn.mr-2(
-                            dark
-                            color="red"
-                            @click="del") Delete
-                        v-btn.mr-2(
-                            color="secondary"
-                            @click="close") Return
+                    v-col
+                        .d-flex.justify-space-between
+                            v-btn.mr-2(
+                                color="primary"
+                                @click="askName") Run
+                            v-btn.mr-2(
+                                color="primary"
+                                @click="clone") Clone
+                            v-btn.mr-2(
+                                color="primary"
+                                @click="save") Save to file
+                            v-spacer
+                            v-btn.mr-2(
+                                dark
+                                color="red"
+                                @click="del") Delete
+                            v-spacer
+                            v-btn.mr-2(
+                                color="secondary"
+                                @click="close") Return
 
         study-runner(
             v-else
@@ -81,6 +87,7 @@ import store from '@/services/storage';
     },
 })
 export default class StudyViewer extends Vue {
+
     @Prop({default: null})
     public study!: Study;
 
@@ -133,6 +140,10 @@ export default class StudyViewer extends Vue {
         this.participantName = '';
     }
 
+    clone() {
+        this.$emit( 'clone', this.study );
+    }
+
     save() {
         IO.download( JSON.stringify( this.study.collectedData ), `${this.study.name}.json` );
     }
@@ -146,7 +157,7 @@ export default class StudyViewer extends Vue {
     }
 
     close() {
-        this.$emit('closed');
+        this.$emit( 'closed' );
     }
 
     finished( participant: Participant ) {

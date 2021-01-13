@@ -79,16 +79,17 @@
                                         :key="option"
                                         :value="option")
 
-                .text-right
-                    v-btn.ml-2(
-                        dark
-                        color="red"
-                        @click="interrupt()") Interrupt
+                .d-flex
                     v-btn.ml-2(
                         dark
                         color="blue"
                         :disabled="hasEmptyRequired"
                         @click="next()")  {{ nextButtonLabel }}
+                    v-spacer
+                    v-btn.ml-2(
+                        dark
+                        color="red"
+                        @click="interrupt()") Interrupt
 </template>
 
 <script lang="ts">
@@ -104,14 +105,15 @@ import Questionnaire from '@/models/questionnaire';
     },
 })
 export default class StudyRunner extends Vue {
+
     @Prop({default: null})
     public study!: Study;
 
     @Prop({default: ''})
     public participantName!: string;
 
-    public participant: Participant | null = null;
-    public questionnaireIndex = 0;
+    participant: Participant | null = null;
+    questionnaireIndex = 0;
 
     get hasEmptyRequired() {
         const quest = this.participant?.questionnaires[ this.questionnaireIndex ];

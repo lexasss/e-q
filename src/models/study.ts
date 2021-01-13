@@ -3,18 +3,24 @@ import Participant from '@/models/participant';
 import { QuestionType } from '@/models/question';
 
 export default class Study {
-    public static from(ref: Partial<Study>) {
+    public static from( ref: Partial<Study>, isCloning = false ) {
         const result = new Study();
 
-        result.id = ref.id ?? result.id;
+        if (!isCloning) {
+            result.id = ref.id ?? result.id;
+        }
+
         result.name = ref.name ?? result.name;
         result.description = ref.description ?? result.description;
         result.questionnaires = ref.questionnaires
             ? ref.questionnaires.map( item => item )
             : result.questionnaires;
-        result.participants = ref.participants
-            ? ref.participants.map( item => Participant.from( item ) )
-            : result.participants;
+
+        if (!isCloning) {
+            result.participants = ref.participants
+                ? ref.participants.map( item => Participant.from( item ) )
+                : result.participants;
+        }
 
         return result;
     }

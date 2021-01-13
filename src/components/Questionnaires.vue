@@ -9,30 +9,64 @@
                     :key="quest.id")
                     v-list-item-content
                         .d-flex.justify-center
-                            v-chip(
-                                :close="isNotUsed(quest)"
-                                color="primary"
-                                outlined
-                                :class="{ 'red': isNotUsed(quest) }"
-                                @click:close="del(quest)") {{ quest.name }}
-                            .ml-4.pt-2.small {{ studies(quest) }}
-            v-subheader.red--text(v-else v-text="'No questionnaires'")
+                            v-badge(
+                                offset-y="14"
+                                :color="cannotUse(quest) ? 'red' : 'primary'"
+                                :value="!!quest.study"
+                                :content="studies(quest)")
+                                v-chip(
+                                    :close="isNotUsed(quest)"
+                                    color="primary"
+                                    :class="{ 'red': isNotUsed(quest) }"
+                                    outlined
+                                    @click:close="del(quest)") {{ quest.name }}
+                                    v-btn.mr-n2(
+                                        icon
+                                        color="primary"
+                                        @click="clone(quest)")
+                                        v-icon(small) mdi-book-multiple
+            v-subheader.red--text(
+                v-else
+                v-text="'No questionnaires'")
+
+            v-btn.mt-4(
+                dark
+                color="green"
+                @click="createNew()") Create new
+
+        v-dialog(
+            v-if="isAddingQuestionnaire"
+            :value="true"
+            persistent
+            max-width="640px")
+            questionnaire-editor.pa-4(
+                :study-id="0"
+                :reference="reference"
+                @save="hideEditor"
+                @cancel="hideEditor")
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+
+import QuestionnaireEditor from '@/components/QuestionnaireEditor.vue';
 
 import Questionnaire from '@/models/questionnaire';
 import Study from '@/models/study';
 
 @Component({
     components: {
+        'questionnaire-editor': QuestionnaireEditor,
     },
 })
 export default class Questionnaires extends Vue {
+
+    isAddingQuestionnaire = false;
+    reference: Questionnaire | null = null;
+
     studies( quest: Questionnaire ) {
         if (quest.study === 0) {
-            return 'public';
+            return '';
         }
         else {
             const study = this.$store.state.studies.find( (item: Study) => item.id === quest.study );
@@ -51,6 +85,15 @@ export default class Questionnaires extends Vue {
         }
     }
 
+    cannotUse( quest: Questionnaire ) {
+        if (quest.study !== 0) {
+            return !this.$store.state.studies.find( (item: Study) => item.id === quest.study );
+        }
+        else {
+            return false;
+        }
+    }
+
     del( quest: Questionnaire ) {
         let isAllowed = true;
         if (quest.study === 0) {
@@ -62,11 +105,19 @@ export default class Questionnaires extends Vue {
             this.$store.dispatch( 'save' );
         }
     }
+
+    clone( quest: Questionnaire ) {
+        this.reference = quest;
+        this.isAddingQuestionnaire = true;
+    }
+
+    createNew() {
+        this.isAddingQuestionnaire = true;
+    }
+
+    hideEditor() {
+        this.isAddingQuestionnaire = false;
+        this.reference = null;
+    }
 }
 </script>
-
-<style scoped lang="less">
-.small {
-    font-size: 0.75em;
-}
-</style>

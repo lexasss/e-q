@@ -7,7 +7,12 @@
             v-show="!isRunningStudy")
 
             div.d-flex.align-center
-                v-img.shrink.mr-3(alt="E-Q Logo" contain src="@/assets/logo.png" transition="scale-transition" width="40")
+                v-img.shrink.mr-3(
+                    alt="E-Q Logo"
+                    contain
+                    src="@/assets/logo.png"
+                    transition="scale-transition"
+                    width="40")
                 v-toolbar-title E-Q
 
             v-spacer
@@ -16,7 +21,17 @@
 
         v-main(:class="{ 'pa-0': isRunningStudy }")
             v-container(fluid)
-                studies
+                template(v-if="!selectedStudy")
+                    studies(
+                        ref="studies"
+                        @study="selectStudy")
+                    v-divider.mt-12
+                    questionnaires
+                study-viewer(
+                    v-else
+                    :study="selectedStudy"
+                    @clone="cloneStudy"
+                    @closed="hideStudyViewer()")
 </template>
 
 <script lang="ts">
@@ -37,17 +52,16 @@ pages:
 + main: list of studies, list of common questionnaires
 - a study:
     + name,
-    - description,
+    + description,
     + list of questionnaires to complete,
         - buttons to order / edit / delete
-        - a button to add a quesionnaire,
+        + a button to add a quesionnaire,
     + a button to add a participant,
     + a button to export data
 - a questionnaire:
     + name, id, common/study-only flag,
-    - questions
+    + questions
         + title,
-        - description,
         + id
         + type:
             + number (from a range)
@@ -58,20 +72,45 @@ pages:
  */
 
 import { Component, Vue } from 'vue-property-decorator';
+
 import Studies from '@/components/Studies.vue';
+import Questionnaires from '@/components/Questionnaires.vue';
+import StudyViewer from '@/components/StudyViewer.vue';
+
+import Study from '@/models/study';
 
 @Component({
-  components: {
-    Studies,
-  },
+    components: {
+        Studies,
+        Questionnaires,
+        'study-viewer': StudyViewer,
+    },
 })
 export default class App extends Vue {
+
+    selectedStudy: Study | null = null;
+
     get isRunningStudy() {
         return this.$store.state.isRunningStudy;
     }
 
+    selectStudy( study: Study ) {
+        this.selectedStudy = study;
+    }
+
+    cloneStudy( study: Study ) {
+        this.selectedStudy = null;
+        this.$nextTick().then(() => {
+            (this.$refs.studies as Studies).clone( study );
+        });
+    }
+
+    hideStudyViewer() {
+        this.selectedStudy = null;
+    }
+
     created() {
-        this.$store.dispatch('connect', 'local');
+        this.$store.dispatch( 'connect', 'local' );
     }
 }
 </script>

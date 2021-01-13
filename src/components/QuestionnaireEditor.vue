@@ -1,6 +1,6 @@
 <template lang="pug">
-    .questionnaire-editor
-        div(v-if="!isAddingQuestion")
+    .white
+        template(v-if="!isAddingQuestion")
             .text-h5 Questionnaire editor
 
             v-text-field(
@@ -11,6 +11,7 @@
                 v-model="questionnaire.description"
                 label="Description")
             v-switch(
+                :disabled="isPublicOnly"
                 v-model="isPublic"
                 label="public")
 
@@ -51,8 +52,10 @@
                     color="red"
                     @click="cancel()") Cancel
 
-        div(v-else)
-            question-editor(@save="addQuestion" @cancel="hideEditor")
+        template(v-else)
+            question-editor(
+                @save="addQuestion"
+                @cancel="hideEditor")
 </template>
 
 <script lang="ts">
@@ -64,13 +67,17 @@ import Questionnaire from '@/models/questionnaire';
 import Question from '@/models/question';
 
 @Component({
-  components: {
-      'question-editor': QuestionEditor,
-  },
+    components: {
+        'question-editor': QuestionEditor,
+    },
 })
 export default class QuestionnaireEditor extends Vue {
+
     @Prop({default: 0})
     public studyId!: number;
+
+    @Prop({default: null})
+    public reference!: Questionnaire;
 
     questionnaire = new Questionnaire('');
 
@@ -91,6 +98,10 @@ export default class QuestionnaireEditor extends Vue {
 
     set isPublic( value: boolean ) {
         this.questionnaire.study = value ? 0 : this.studyId;
+    }
+
+    get isPublicOnly() {
+        return this.studyId === 0;
     }
 
     addQuestion( question: Question ) {
@@ -120,6 +131,12 @@ export default class QuestionnaireEditor extends Vue {
 
     cancel() {
         this.$emit( 'cancel' );
+    }
+
+    created() {
+        if (this.reference) {
+            this.questionnaire.copyFrom( this.reference, false );
+        }
     }
 }
 </script>

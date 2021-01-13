@@ -1,55 +1,42 @@
 <template lang="pug">
     .studies
-        template(v-if="!selectedStudy")
-            .text-h4.my-4 Studies
+        .text-h4.my-4 Studies
 
-            .d-flex.flex-column(v-if="!!$store.state.studies.length")
-                v-btn(
-                    v-for="study in $store.state.studies"
-                    v-text="study.name"
-                    :key="study.id"
-                    @click="show(study)")
-            v-subheader.red--text(v-else) No studies, click the button below to create a new one.
+        .d-flex.flex-column(v-if="!!$store.state.studies.length")
+            v-btn(
+                v-for="study in $store.state.studies"
+                v-text="study.name"
+                :key="study.id"
+                @click="show(study)")
+        v-subheader.red--text(v-else) No studies, click the button below to create a new one.
 
-            v-btn.mt-4(
-                dark
-                color="green"
-                @click="createNew()") Create new
+        v-btn.mt-4(
+            dark
+            color="green"
+            @click="createNew()") Create new
 
-            .questionnaires.mt-12
-                questionnaires
-
-            v-dialog(
-                v-if="!!editedStudy"
-                :value="true"
-                persistent
-                max-width="640px")
-                study-editor(
-                    :study="editedStudy"
-                    @save="save"
-                    @cancel="cancel")
-
-        study-viewer(
-            v-else
-            :study="selectedStudy"
-            @closed="hide()")
+        v-dialog(
+            v-if="!!editedStudy"
+            :value="true"
+            persistent
+            max-width="640px")
+            study-editor.pa-4(
+                :study="editedStudy"
+                @save="save"
+                @cancel="cancel")
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 // import { mapActions } from 'vuex';
 
-import Questionnaires from '@/components/Questionnaires.vue';
 import StudyEditor from '@/components/StudyEditor.vue';
-import StudyViewer from '@/components/StudyViewer.vue';
 
 import Study from '@/models/study';
 
 @Component({
     components: {
-        Questionnaires,
         'study-editor': StudyEditor,
-        'study-viewer': StudyViewer,
     },
     // methods: {
     //    ...mapActions(['addTodo'])
@@ -58,7 +45,10 @@ import Study from '@/models/study';
 export default class Studies extends Vue {
 
     editedStudy: Study | null = null;
-    selectedStudy: Study | null = null;
+
+    public clone( study: Study ) {
+        this.editedStudy = Study.from( study, true );
+    }
 
     createNew() {
         this.editedStudy = new Study();
@@ -75,11 +65,7 @@ export default class Studies extends Vue {
     }
 
     show( study: Study ) {
-        this.selectedStudy = study;
-    }
-
-    hide() {
-        this.selectedStudy = null;
+        this.$emit( 'study', study );
     }
 }
 </script>

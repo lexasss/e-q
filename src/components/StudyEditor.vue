@@ -1,6 +1,6 @@
 <template lang="pug">
-    .study-editor
-        div(v-if="!isAddingQuestionnaire")
+    .white
+        template(v-if="!isAddingQuestionnaire")
             .text-h5 Study editor
 
             v-text-field(
@@ -38,8 +38,11 @@
                     color="red"
                     @click="cancel()") Cancel
 
-        div(v-else)
-            questionnaire-editor(:study-id="study.id" @save="addQuestionnaire" @cancel="hideEditor")
+        template(v-else)
+            questionnaire-editor(
+                :study-id="study.id"
+                @save="addQuestionnaire"
+                @cancel="hideEditor")
 </template>
 
 <script lang="ts">
@@ -52,12 +55,13 @@ import Questionnaire from '@/models/questionnaire';
 import Study from '@/models/study';
 
 @Component({
-  components: {
-      'questionnaire-list': QuestionnaireList,
-      'questionnaire-editor': QuestionnaireEditor,
-  },
+    components: {
+        'questionnaire-list': QuestionnaireList,
+        'questionnaire-editor': QuestionnaireEditor,
+    },
 })
 export default class StudyEditor extends Vue {
+
     @Prop({default: null})
     public study!: Study;
 
@@ -94,10 +98,3 @@ export default class StudyEditor extends Vue {
     }
 }
 </script>
-
-<style scoped lang="less">
-.study-editor {
-    padding: 1em;
-    background-color:  white;
-}
-</style>

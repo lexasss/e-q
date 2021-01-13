@@ -1,5 +1,5 @@
 <template lang="pug">
-    .question-editor
+    .white
         .text-h5 Question editor
 
         v-text-field(
@@ -138,10 +138,11 @@ import Question, {
     QuestionParams } from '@/models/question';
 
 @Component({
-  components: {
-  },
+    components: {
+    },
 })
 export default class QuestionEditor extends Vue {
+
     name = '';
     type = QuestionType.None;
     isRequired = true;
