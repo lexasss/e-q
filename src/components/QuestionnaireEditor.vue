@@ -17,19 +17,21 @@
 
             v-list(dense)
                 .subtitle-1.text-left Questions
-                template(v-if="questionnaire.items.length")
-                    v-list-item(
+                draggable.d-flex.flex-column(
+                    v-if="questionnaire.items.length"
+                    :list="questionnaire.items"
+                    @change="onSwapped")
+                    v-chip.mt-1(
                         v-for="(item, index) in questionnaire.items"
-                        :key="index")
-                        v-list-item-content
-                            .d-flex
-                                v-chip(
-                                    close
-                                    color="primary"
-                                    outlined
-                                    @click:close="remove(item)") {{ item.name }}
-                                .red--text(v-if="item.isRequired") *
-                v-subheader.red--text(v-else v-text="'No questions, click the button below to add some.'")
+                        :key="index"
+                        close
+                        color="primary"
+                        outlined
+                        @click:close="remove(item)") {{ item.name }}
+                        .red--text(v-if="item.isRequired") *
+                v-subheader.red--text(
+                    v-else
+                    v-text="'No questions, click the button below to add some.'")
             
             v-btn(
                 block
@@ -60,6 +62,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import draggable from 'vuedraggable';
 
 import QuestionEditor from '@/components/QuestionEditor.vue';
 
@@ -69,6 +72,7 @@ import Question from '@/models/question';
 @Component({
     components: {
         'question-editor': QuestionEditor,
+        draggable,
     },
 })
 export default class QuestionnaireEditor extends Vue {
@@ -138,5 +142,24 @@ export default class QuestionnaireEditor extends Vue {
             this.questionnaire.copyFrom( this.reference, false );
         }
     }
+
+    onSwapped( event: any ) {
+        if (event.moved) {
+            const items = this.questionnaire.items;
+            const temp = items[ event.oldIndex ];
+            items[ event.oldIndex ] = items[ event.newIndex ];
+            items[ event.newIndex ] = temp;
+        }
+    }
 }
 </script>
+
+<style>
+.v-chip__content {
+    width: 100%;
+}
+
+.v-chip__close {
+    margin-left: auto !important;
+}
+</style>

@@ -1,9 +1,11 @@
 <template lang="pug">
     .questionnaire-list
-        .mb-2.text-left(v-if="ids.length")
+        .text-left(v-if="ids.length")
             v-chip-group(column)
-                draggable(:list="ids" @change="onSwapped")
-                    v-chip.ma-2(
+                draggable(
+                    :list="ids"
+                    @change="onSwapped")
+                    v-chip.mr-2(
                         v-for="(id, index) in ids"
                         :key="index"
                         close
@@ -15,7 +17,7 @@
         v-subheader.red--text(v-else) No questionnaires, select some existing from the list below or create a new one. 
 
         .d-flex
-            v-select.text-left(
+            v-select.mb-2.text-left(
                 v-model="selectedQuestionnaire"
                 :items="availableQuestionnaires"
                 item-text="name"
