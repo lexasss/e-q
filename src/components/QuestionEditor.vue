@@ -1,114 +1,128 @@
 <template lang="pug">
     .question-editor
-        h2.subtitle.is-4 Question editor
+        .text-h5 Question editor
 
-        .field.is-horizontal
-            .field-label.is-normal
-                label.label Name
-            .field-body
-                .field
-                    .control.is-expanded
-                        input.input(type="text" placeholder="Question" v-model="name")
+        v-text-field(
+            v-model="name"
+            label="Name"
+            :rules="nameRules")
+        v-switch(v-model="isRequired" label="required")
 
-        .field.is-horizontal
-            .field-label.is-normal
-            .field-body
-                .field.has-text-left
-                    label.checkbox
-                        input(type="checkbox" v-model="isRequired")
-                        span is required
+        v-select.text-left(
+            v-model="type"
+            :items="questionTypes"
+            item-text="name"
+            item-value="index"
+            type="number"
+            persistent-hint
+            label="Type"
+            single-line
+            @change="typeChanged")
 
-        .field.is-horizontal
-            .field-label.is-normal
-                label.label Type
-            .field-body
-                .field.is-narrow
-                    .control
-                        .select.is-fullwidth
-                            select(v-model="type" @change="typeChanged")
-                                option(v-for="(questionType, index) in questionTypes" :value="index + 1") {{ questionType }}
+        template(v-if="isText")
+            v-subheader Maximum length
+            v-slider(
+                v-model.number="params.maxLength"
+                min="0"
+                max="255"
+                thumb-label)
+                template(v-slot:append)
+                    .ml-2 {{ params.maxLength }}
 
-        .field.is-horizontal(v-if="isText")
-            .field-label.is-normal
-                label.label Max length
-            .field-body
-                .field
-                    .control.is-expanded
-                        input.input(type="number" placeholder="Maximum length" min="0" v-model.number="params.maxLength")
+        template(v-if="isNumber || isScale")
+            v-slider.mt-6(
+                v-model.number="params.min"
+                :min="isScale ? -10 : -1000"
+                :max="params.max"
+                label="Min"
+                thumb-label)
+                template(v-slot:append)
+                    v-text-field.ma-0.pa-0.mt-n2(
+                        v-model.number="params.min"
+                        :min="isScale ? -10 : -1000"
+                        :max="params.max"
+                        type="number"
+                        style="width: 60px"
+                        solo
+                        dense)
 
-        .field.is-horizontal(v-if="isNumber || isScale")
-            .field-label.is-normal
-                label.label Min
-            .field-body
-                 .field
-                    .control.is-expanded
-                        input.input(type="number" placeholder="Min" :max="params.max" v-model.number="params.min")
-        .field.is-horizontal(v-if="isNumber || isScale")
-            .field-label.is-normal
-                label.label Max
-            .field-body
-                .field
-                    .control.is-expanded
-                        input.input(type="number" placeholder="Max" :min="params.min" v-model.number="params.max")
+            v-slider(
+                v-model.number="params.max"
+                :min="params.min"
+                :max="isScale ? 20 : 1000"
+                label="Max"
+                thumb-label)
+                template(v-slot:append)
+                    v-text-field.ma-0.pa-0.mt-n2(
+                        v-model.number="params.max"
+                        :min="params.min"
+                        :max="isScale ? 20 : 1000"
+                        type="number"
+                        style="width: 60px"
+                        solo
+                        dense)
 
         template(v-if="isChoice")
-            .field.is-horizontal
-                .field-label.is-normal
-                    label.label Options
-                .field-body
-                    .field
-                        .control(v-if="hasOptions")
-                            .field.is-grouped(v-for="(item, i) in params.items")
-                                button.button.is-danger.add-or-remove(@click="removeOption( i )") x
-                                .option {{ (i + 1) + '.' }} {{ item }}
-                        .no-items(v-else) No options, type some text into the box underneath and click '+' button to add.
-
-                        .field.has-addons
-                            .control.is-expanded
-                                input.input(type="text" v-model="option")
-                            .control
-                                button.button.is-success(@click="addOption" :disabled="option === ''") +
-            .field.is-horizontal
-                .field-label.is-normal
-                .field-body
-                    label.checkbox
-                        input(type="checkbox" v-model="params.asDropdownList" :disabled="params.isMultiple")
-                        span show as a drop-down list
+            .subtitle-1.text-left Options
+            v-list(dense)
+                template(v-if="hasOptions")
+                    v-list-item(
+                        v-for="(item, index) in params.items"
+                        :key="index")
+                        v-list-item-content
+                            v-chip(
+                                close
+                                color="primary"
+                                outlined
+                                @click:close="removeOption( index )") {{ item }}
+                v-subheader.red--text(v-else v-text="'No options, type some text into the box underneath and click the button to add'")
+            .d-flex
+                v-text-field(
+                    v-model="option"
+                    solo
+                    label="new option"
+                    :rules="optionRules")
+                v-btn.mx-2(
+                    fab
+                    dark
+                    color="green"
+                    :disabled="option === ''"
+                    @click="addOption()")
+                    v-icon(dark) mdi-plus
+            v-switch(
+                v-model="params.asDropdownList"
+                :disabled="params.isMultiple"
+                label="as a drop-down list")
 
         template(v-if="isScale")
-            .field.is-horizontal
-                .field-label.is-normal
-                    label.label Left label
-                .field-body
-                    .field
-                        .control.is-expanded
-                            input.input(type="text" v-model="params.labelLeft")
-            .field.is-horizontal
-                .field-label.is-normal
-                    label.label Center label
-                .field-body
-                    .field
-                        .control.is-expanded
-                            input.input(type="text" v-model="params.labelCenter")
-            .field.is-horizontal
-                .field-label.is-normal
-                    label.label Right label
-                .field-body
-                    .field
-                        .control.is-expanded
-                            input.input(type="text" v-model="params.labelRight")
-            .field.is-horizontal
-                .field-label.is-normal
-                .field-body
-                    label.checkbox
-                        input(type="checkbox" v-model="params.hasSlider")
-                        span show as a slider
+            v-text-field(
+                v-model="params.labelLeft"
+                clearable
+                label="Left label")
+            v-text-field(
+                v-model="params.labelCenter"
+                clearable
+                label="Center label")
+            v-text-field(
+                v-model="params.labelRight"
+                clearable
+                label="Right label")
+            v-switch(v-model="params.hasSlider" label="as a slider")
 
+        v-divider.my-4
 
-        hr
-        .buttons.is-right
-            button.button.is-rounded.is-success(:disabled="!isValidQuestion" @click="save()") Save
-            button.button.is-rounded.is-danger(@click="cancel()") Cancel
+        .text-right
+            v-btn.mr-2(
+                rounded
+                dark
+                color="green"
+                :disabled="!isValidQuestion"
+                @click="save()") Save
+            v-btn(
+                rounded
+                dark
+                color="red"
+                @click="cancel()") Cancel
 </template>
 
 <script lang="ts">
@@ -128,13 +142,13 @@ import Question, {
   },
 })
 export default class QuestionEditor extends Vue {
-    public name = '';
-    public type = QuestionType.None;
-    public isRequired = true;
-    public params: QuestionParams = {
+    name = '';
+    type = QuestionType.None;
+    isRequired = true;
+    params: QuestionParams = {
         maxLength: 100,
         min: 0,
-        max: 100,
+        max: 10,
         isMultiple: false,
         asDropdownList: false,
         items: [] as string[],
@@ -144,9 +158,33 @@ export default class QuestionEditor extends Vue {
         hasSlider: false,
     };
 
-    public questionTypes = [ 'text', 'number', 'one choice', 'multiple choices', 'scale' ];
-    public maxLength = 0;
-    public option = '';
+    questionTypes = [{
+        index: QuestionType.Text,
+        name: 'text',
+    }, {
+        index: QuestionType.Number,
+        name: 'number',
+    }, {
+        index: QuestionType.ChoiceOne,
+        name: 'one choice',
+    }, {
+        index: QuestionType.ChoiceMultiple,
+        name: 'multiple choices',
+    }, {
+        index: QuestionType.Scale,
+        name: 'scale',
+    }];
+
+    maxLength = 0;
+    option = '';
+
+    nameRules = [
+        (value: string) => !!value || 'Required.',
+        (value: string) => (value && value.length >= 2) || 'Min 2 characters',
+    ];
+    optionRules = [
+        (value: string) => !!value || 'Required.',
+    ];
 
     get isValidQuestion() {
         if (this.isChoice) {
@@ -236,27 +274,3 @@ export default class QuestionEditor extends Vue {
     }
 }
 </script>
-
-<style scoped lang="less">
-.questionnaire-editor {
-    padding: 1em;
-    background-color:  white;
-}
-
-input[type="checkbox"] {
-    margin-right: 1em;
-}
-
-.option {
-    line-height: 2.5em;
-    vertical-align: middle;
-    margin: 0 0.5em;
-    text-align: left;
-}
-
-.no-items {
-    font-style: italic;
-    font-size: 0.75em;
-    line-height: 2.5rem;
-}
-</style>

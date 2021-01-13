@@ -34,7 +34,8 @@ export default class Study {
         return this.participants.map( p => { return {
             name: p.name,
             results: p.questionnaires.map( quest => { return {
-                questionnaire: quest.name,
+                questionnaire: quest.id,
+                name: quest.name,
                 answers: quest.answers.map( q => { return {
                     question: q.id,
                     text: q.name,

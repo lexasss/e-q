@@ -1,4 +1,4 @@
-# e-q
+# e-q, an offline questionnaire
 
 ## Project setup
 ```

@@ -1,50 +1,55 @@
 <template lang="pug">
     .questionnaire-editor
         div(v-if="!isAddingQuestion")
-            h2.subtitle.is-4 Questionnaire editor
+            .text-h5 Questionnaire editor
 
-            .field.is-horizontal
-                .field-label.is-normal
-                    label.label Name
-                .field-body
-                    .field
-                        .control.is-expanded
-                            input.input(type="text" placeholder="Questionnaire name" v-model="questionnaire.name")
+            v-text-field(
+                v-model="questionnaire.name"
+                label="Name"
+                :rules="nameRules")
+            v-textarea(
+                v-model="questionnaire.description"
+                label="Description")
+            v-switch(
+                v-model="isPublic"
+                label="public")
 
-            .field.is-horizontal
-                .field-label.is-normal
-                    label.label Description
-                .field-body
-                    .field
-                        .control.is-expanded
-                            textarea.textarea(placeholder="Questionnaire description" v-model="questionnaire.description")
+            v-list(dense)
+                .subtitle-1.text-left Questions
+                template(v-if="questionnaire.items.length")
+                    v-list-item(
+                        v-for="(item, index) in questionnaire.items"
+                        :key="index")
+                        v-list-item-content
+                            .d-flex
+                                v-chip(
+                                    close
+                                    color="primary"
+                                    outlined
+                                    @click:close="remove(item)") {{ item.name }}
+                                .red--text(v-if="item.isRequired") *
+                v-subheader.red--text(v-else v-text="'No questions, click the button below to add some.'")
+            
+            v-btn(
+                block
+                dark
+                color="green"
+                @click="createNew()") Add a question
 
-            .field.is-horizontal
-                .field-label.is-normal
-                .field-body
-                    .field.has-text-left
-                        label.checkbox
-                            input(type="checkbox" v-model="isPublic")
-                            span is public
+            v-divider.my-4
 
-            .field.is-horizontal
-                .field-label.is-normal
-                    label.label Questions
-                .field-body
-                    .field
-                        .control(v-if="questionnaire.items.length")
-                            .field.is-grouped.questions(v-for="(item, index) in questionnaire.items")
-                                button.button.is-danger.add-or-remove(@click="remove(item)") x
-                                .question.is-expanded {{ index + 1 }}. {{ item.name }}
-                                .required(v-show="item.isRequired") *
-                        .control.no-items(v-else) No questions, click '+' button to add some.
-                        .field.is-grouped
-                            button.button.is-success.add-or-remove(@click="createNew()") +
-
-            hr
-            .buttons.is-right
-                button.button.is-rounded.is-success(:disabled="!isValidQuestionnaire" @click="save()") Save
-                button.button.is-rounded.is-danger(@click="cancel()") Cancel
+            .text-right
+                v-btn.mr-2(
+                    rounded
+                    dark
+                    color="green"
+                    :disabled="!isValidQuestionnaire"
+                    @click="save()") Save
+                v-btn(
+                    rounded
+                    dark
+                    color="red"
+                    @click="cancel()") Cancel
 
         div(v-else)
             question-editor(@save="addQuestion" @cancel="hideEditor")
@@ -67,11 +72,16 @@ export default class QuestionnaireEditor extends Vue {
     @Prop({default: 0})
     public studyId!: number;
 
-    public questionnaire = new Questionnaire('');
+    questionnaire = new Questionnaire('');
 
-    public isAddingQuestion = false;
+    isAddingQuestion = false;
 
-    public get isValidQuestionnaire() {
+    nameRules = [
+        (value: string) => !!value || 'Required.',
+        (value: string) => (value && value.length >= 3) || 'Min 3 characters',
+    ];
+
+    get isValidQuestionnaire() {
         return this.questionnaire.isValid;
     }
 
@@ -113,39 +123,3 @@ export default class QuestionnaireEditor extends Vue {
     }
 }
 </script>
-
-<style scoped lang="less">
-.questionnaire-editor {
-    background-color:  white;
-}
-
-input[type="checkbox"] {
-    margin-right: 1em;
-}
-
-.field.questions {
-    margin-bottom: 0;
-}
-
-button.add-or-remove {
-    width: 2.5em;
-}
-
-.question {
-    line-height: 2.5em;
-    vertical-align: middle;
-    margin: 0 0.5em;
-    text-align: left;
-}
-
-.no-items {
-    font-style: italic;
-    font-size: 0.75em;
-    line-height: 2.5rem;
-}
-
-.required {
-    color: red;
-    line-height: 2.5rem;
-}
-</style>

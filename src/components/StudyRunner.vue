@@ -1,49 +1,94 @@
 <template lang="pug">
-    .study-runner
+    .study-runner.mx-auto
         .questionnaire-viewer(v-for="(questionnaire, questIndex) in participant.questionnaires" :key="questionnaire.id")
             .questionnaire(v-if="questIndex === questionnaireIndex")
-                h5.subtitle.is-5 {{ name( questionnaire.id ) }}
-                h6.subtitle.is-6.has-text-left {{ description( questionnaire.id ) }}
+                .text-h5 {{ name( questionnaire.id ) }}
+                .text-subtitle-1.text-left.my-5 {{ description( questionnaire.id ) }}
 
-                .field.has-text-left(v-for="(q, i) in questionnaire.answers" :key="q.id")
-                    label.label {{ (i + 1) + '.' }} {{ q.name }}
-                        .is-required(v-if="q.isRequired") *
-                    .control(v-if="isText( q.type )")
-                        input.input(v-if="q.maxLength > 0" type="text" :maxlength="q.maxLength" v-model.trim="q.value")
-                        textarea.textarea(v-else v-model="q.value")
-                    .control(v-else-if="isNumber( q.type )")
-                        input.input(type="number" :min="q.min" :max="q.max" v-model.number="q.value")
-                    .control(v-else-if="isChoiceOne( q.type )")
-                        .field(v-if="q.asDropdownList")
-                            .select
-                                select(v-model="q.value")
-                                    option(v-for="option in q.items" :value="option") {{ option }}
-                        .field(v-else)
-                            .answer-item(v-for="option in q.items")
-                                input(type="radio" :id="q.id + '-' + option" :value="option" v-model="q.value")
-                                label.item-label(:for="q.id + '-' + option") {{ option }}
-                    .control(v-else-if="isChoiceMultiple( q.type )")
-                        .field.answer-item(v-for="option in q.items")
-                            input(type="checkbox" :id="q.id + '-' + option" :value="option" v-model="q.value")
-                            label.item-label(:for="q.id + '-' + option") {{ option }}
-                    .control(v-else-if="isScale( q.type )")
-                        .scale-items
-                            .scale-items-row(:style="getScaleWidth(q.min, q.max)")
-                                .scale-as-slider(v-if="q.hasSlider")
-                                    v-slider(:min="q.min" :max="q.max" v-model="q.value" ticks="always" tick-size="4" thumb-label)
-                                .scale-as-options.is-flex(v-else)
-                                    .scale-item(v-for="option in range(q.min, q.max)")
-                                        input(type="radio" :value="option" v-model="q.value")
-                            .scale-labels(:style="getScaleWidth(q.min, q.max)")
-                                .scale-label {{ q.labelLeft }}
-                                .scale-label {{ q.labelCenter }}
-                                .scale-label {{ q.labelRight }}
+                .text-left(v-for="(q, i) in questionnaire.answers" :key="q.id")
 
-                .field.is-grouped.is-align-items-stretch
-                    .control
-                        button.button.is-info(:disabled="hasEmptyRequired" @click="next()") {{ nextButtonLabel }}
-                    .control
-                        button.button.is-danger(@click="interrupt()") Interrupt
+                    .text-subtitle-2.font-weight-black {{ (i + 1) + '.' }} {{ q.name }}
+                        .d-inline.red--text.pl-1(v-if="q.isRequired") *
+
+                    template(v-if="isText( q.type )")
+                        v-text-field(
+                            v-if="q.maxLength > 0"
+                            type="text"
+                            outlined
+                            :counter="q.maxLength"
+                            :maxlength="q.maxLength"
+                            v-model.trim="q.value")
+                        v-textarea(
+                            v-else
+                            outlined
+                            v-model="q.value")
+
+                    template(v-else-if="isNumber( q.type )")
+                        v-text-field(
+                            type="number"
+                            outlined
+                            :min="q.min"
+                            :max="q.max"
+                            v-model.trim="q.value")
+
+                    template(v-else-if="isChoiceOne( q.type )")
+                        v-select.mt-n1.mb-2(
+                            v-if="q.asDropdownList"
+                            v-model="q.value"
+                            :items="q.items")
+                        v-radio-group.mt-0(
+                            v-else
+                            v-model="q.value")
+                            v-radio(
+                                v-for="option in q.items"
+                                :key="option"
+                                :label="option"
+                                :value="option")
+
+                    .mb-3(v-else-if="isChoiceMultiple( q.type )")
+                        v-checkbox.mt-0(
+                            v-for="(option, index) in q.items"
+                            v-model="q.value"
+                            :key="index"
+                            :label="option"
+                            :value="option")
+
+                    template(v-else-if="isScale( q.type )")
+                        v-flex.flex-column
+                            .d-flex.justify-space-between(:style="getScaleWidth(q.min, q.max)")
+                                .d-inline-block {{ q.labelLeft }}
+                                .d-inline-block {{ q.labelCenter }}
+                                .d-inline-block {{ q.labelRight }}
+                            v-flex(:style="getScaleWidth(q.min, q.max)")
+                                v-container.pa-0(
+                                    v-if="q.hasSlider"
+                                    fluid)
+                                    v-slider(
+                                        :min="q.min"
+                                        :max="q.max"
+                                        v-model="q.value"
+                                        ticks="always"
+                                        tick-size="4"
+                                        thumb-label)
+                                v-radio-group.my-0(
+                                    v-else
+                                    row
+                                    v-model="q.value")
+                                    v-radio.ma-0.pa-0(
+                                        v-for="option in range(q.min, q.max)"
+                                        :key="option"
+                                        :value="option")
+
+                .text-right
+                    v-btn.ml-2(
+                        dark
+                        color="red"
+                        @click="interrupt()") Interrupt
+                    v-btn.ml-2(
+                        dark
+                        color="blue"
+                        :disabled="hasEmptyRequired"
+                        @click="next()")  {{ nextButtonLabel }}
 </template>
 
 <script lang="ts">
@@ -118,7 +163,7 @@ export default class StudyRunner extends Vue {
     }
 
     getScaleWidth( min: number, max: number ) {
-        return `width: ${32 * (max - min + 1)}px`;
+        return `width: ${36 * (max - min + 1)}px; min-width: 500px`;
     }
 
     next() {
@@ -150,61 +195,15 @@ export default class StudyRunner extends Vue {
 <style scoped lang="less">
 .study-runner {
     max-width: 920px;
-    margin: 0 auto;
+}
+</style>
+
+<style>
+.v-input--radio-group--row .v-input--radio-group__input {
+    justify-content: space-between !important;
 }
 
-.is-required {
-    display: inline;
-    color: red;
-    padding-left: 0.25em;
-}
-
-.item-label {
-    margin-left: 0.5em;
-}
-
-.answer-item {
-    margin-left: 1em;
-}
-
-.is-full-width {
-    width: 100%;
-}
-
-.scale-items {
-    display: flex;
-    flex-direction: column;
-}
-
-.scale-items-row {
-    display: flex;
-    padding: 0.25em 0; 
-    margin: 0 auto;
-    max-width: 100%;
-}
-
-.scale-labels {
-    display: flex;
-    justify-content: space-between;
-    margin: 0 auto;
-    max-width: 100%;
-}
-
-.scale-label {
-    display: flex;
-}
-
-.scale-as-slider {
-    width: 100%;
-    justify-content: space-between;
-}
-
-.scale-as-options {
-    width: 100%;
-    justify-content: space-between;
-}
-
-select {
-    min-width: 11em;
+.v-input--checkbox .v-messages {
+    min-height: 0 !important;
 }
 </style>

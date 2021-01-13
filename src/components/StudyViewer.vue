@@ -1,56 +1,66 @@
 <template lang="pug">
     .study-viewer
-        h2.subtitle.is-4 {{ header }}
+        .text-h4.my-4 {{ header }}
 
         template(v-if="!isRunning")
-            .field.is-horizontal
-                .field-label
-                    .label.label Description:
-                .field-body
-                    .field
-                        .control.is-expanded
-                            .has-text-left {{ study.description }}
-            .field.is-horizontal
-                .field-label
-                    .label.label Questionnaires:
-                .field-body
-                    .field
-                        .control.is-expanded
-                            .has-text-left {{ questList }}
-            .field.is-horizontal
-                .field-label
-                    .label.label Participants:
-                .field-body
-                    .field
-                        .control.is-expanded
-                            .has-text-left {{ study.participants.length }}
-            .field.is-horizontal
-                .field-label
-                    .label.label
-                .field-body
-                    .field.is-grouped
-                        .control
-                            button.button.is-info(@click="askName") Run
-                        .control
-                            button.button.is-info(@click="save") Save to file
-                        .control
-                            button.button.is-danger(@click="del") Delete
-                        .control
-                            button.button.is-warning(@click="close") Return
+            v-container
+                v-row
+                    v-col(md="2").text-subtitle-1.font-weight-bold.text-right Description:
+                    v-col.text-left {{ study.description }}
+                v-row
+                    v-col(md="2").text-subtitle-1.font-weight-bold.text-right Questionnaires:
+                    v-col.text-left {{ questList }}
+                v-row
+                    v-col(md="2").text-subtitle-1.font-weight-bold.text-right Participants:
+                    v-col.text-left {{ study.participants.length }}
+                v-row
+                    v-col(md="2").text-subtitle-1.font-weight-bold.text-right
+                    v-col.text-left
+                        v-btn.mr-2(
+                            color="primary"
+                            @click="askName") Run
+                        v-btn.mr-2(
+                            color="primary"
+                            @click="save") Save to file
+                        v-btn.mr-2(
+                            dark
+                            color="red"
+                            @click="del") Delete
+                        v-btn.mr-2(
+                            color="secondary"
+                            @click="close") Return
 
-        study-runner(v-else :participant-name="participantName" :study="study" @finished="finished")
+        study-runner(
+            v-else
+            :participant-name="participantName"
+            :study="study"
+            @finished="finished")
 
-        .modal(:class="{ 'is-active': isAskingName }")
-            .modal-background
-            .modal-content.is-clipped
-                .new-participant(@keyup.escape="cancel()" @keyup.enter="run()")
-                    h4.is-4 New participant
-                    .field
-                        .control
-                            input.input(v-model="participantName" ref="participantName")
-                    .buttons.is-right
-                        button.button.is-rounded.is-success(:disabled="!isValidName" @click="run()") Start
-                        button.button.is-rounded.is-danger(@click="cancel()") Cancel
+        v-dialog(
+            v-model="isAskingName"
+            persistent
+            max-width="500px")
+            v-card
+                v-card-title New participant
+                v-card-text
+                    v-text-field(
+                        v-model="participantName"
+                        label="Name"
+                        ref="participantName"
+                        :rules="nameRules")
+                v-card-actions
+                    v-spacer
+                    v-btn.mr-2.px-4(
+                        rounded
+                        dark
+                        color="green"
+                        :disabled="!isValidName"
+                        @click="run()") Start
+                    v-btn.px-4(
+                        rounded
+                        dark
+                        color="red"
+                        @click="cancel()") Cancel
 </template>
 
 <script lang="ts">
@@ -74,10 +84,15 @@ export default class StudyViewer extends Vue {
     @Prop({default: null})
     public study!: Study;
 
-    public isRunning = false;
-    public isAskingName = false;
-    public isShowingDeleteWarning = false;
-    public participantName = '';
+    isRunning = false;
+    isAskingName = false;
+    isShowingDeleteWarning = false;
+    participantName = '';
+
+    nameRules = [
+        (value: string) => !!value || 'Required.',
+        (value: string) => (value && value.length >= 2) || 'Min 2 characters',
+    ];
 
     get header() {
         return this.study.name + (this.participantName ? ' // ' + this.participantName : '');
@@ -148,20 +163,11 @@ export default class StudyViewer extends Vue {
         this.isRunning = false;
         this.participantName = '';
     }
-
-    created() {
-        // ok
-    }
-
-    mounted() {
-        // ok
-    }
 }
 </script>
 
-<style scoped lang="less">
-.new-participant {
-    background-color: white;
-    padding: 1em;
+<style>
+.v-text-field__details, .v-messages {
+    min-height: 0 !important;
 }
 </style>

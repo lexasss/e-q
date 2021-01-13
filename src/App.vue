@@ -1,6 +1,11 @@
 <template lang="pug">
     v-app#app
-        v-app-bar(app color="primary" dark v-show="!isRunningStudy")
+        v-app-bar(
+            app
+            color="primary"
+            dark
+            v-show="!isRunningStudy")
+
             div.d-flex.align-center
                 v-img.shrink.mr-3(alt="E-Q Logo" contain src="@/assets/logo.png" transition="scale-transition" width="40")
                 v-toolbar-title E-Q
@@ -9,7 +14,7 @@
 
             v-subheader offline questionnaire
 
-        v-main
+        v-main(:class="{ 'pa-0': isRunningStudy }")
             v-container(fluid)
                 studies
 </template>

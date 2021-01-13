@@ -1,23 +1,38 @@
 <template lang="pug">
     .studies
-        template(v-if="!study")
-            h2.subtitle.is-4 Studies
-            .list(v-if="!!$store.state.studies.length")
-                .item(v-for="study in $store.state.studies")
-                    button.button.study-item(@click="show(study)") {{ study.name }}
-            .no-items(v-else) No studies
+        template(v-if="!selectedStudy")
+            .text-h4.my-4 Studies
 
-            button.button.is-success(@click="createNew()") Create new
+            .d-flex.flex-column(v-if="!!$store.state.studies.length")
+                v-btn(
+                    v-for="study in $store.state.studies"
+                    v-text="study.name"
+                    :key="study.id"
+                    @click="show(study)")
+            v-subheader.red--text(v-else) No studies, click the button below to create a new one.
 
-            .questionnaires
+            v-btn.mt-4(
+                dark
+                color="green"
+                @click="createNew()") Create new
+
+            .questionnaires.mt-12
                 questionnaires
 
-            .modal(:class="{ 'is-active': !!editedStudy }")
-                .modal-background
-                .modal-content(v-if="!!editedStudy")
-                    study-editor(:study="editedStudy" @save="save" @cancel="cancel")
+            v-dialog(
+                v-if="!!editedStudy"
+                :value="true"
+                persistent
+                max-width="640px")
+                study-editor(
+                    :study="editedStudy"
+                    @save="save"
+                    @cancel="cancel")
 
-        study-viewer(v-else :study="study" @closed="hide()")
+        study-viewer(
+            v-else
+            :study="selectedStudy"
+            @closed="hide()")
 </template>
 
 <script lang="ts">
@@ -41,49 +56,30 @@ import Study from '@/models/study';
     // },
 })
 export default class Studies extends Vue {
-    public editedStudy: Study | null = null;
-    public study: Study | null = null;
+
+    editedStudy: Study | null = null;
+    selectedStudy: Study | null = null;
 
     createNew() {
         this.editedStudy = new Study();
     }
 
-    save(study: Study) {
+    save( study: Study ) {
         this.editedStudy = null;
-        this.$store.commit('addStudy', study);
-        this.$store.dispatch('save');
+        this.$store.commit( 'addStudy', study );
+        this.$store.dispatch( 'save' );
     }
 
     cancel() {
         this.editedStudy = null;
     }
 
-    show(study: Study) {
-        this.study = study;
+    show( study: Study ) {
+        this.selectedStudy = study;
     }
 
     hide() {
-        this.study = null;
+        this.selectedStudy = null;
     }
 }
 </script>
-
-<style scoped lang="less">
-.list {
-    margin: 1em;
-}
-
-.study-item {
-    width: 100%;
-}
-
-.no-items {
-    font-style: italic;
-    font-size: 0.75em;
-    line-height: 2.5rem;
-}
-
-.questionnaires {
-    margin-top: 4em;
-}
-</style>

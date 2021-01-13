@@ -1,43 +1,42 @@
 <template lang="pug">
     .study-editor
         div(v-if="!isAddingQuestionnaire")
-            h2.subtitle.is-4 Study editor
+            .text-h5 Study editor
 
-            .field.is-horizontal
-                .field-label.is-normal
-                    label.label Name
-                .field-body
-                    .field
-                        .control.is-expanded
-                            input.input(type="text" placeholder="Study name" v-model="study.name")
+            v-text-field(
+                v-model="study.name"
+                label="Name"
+                :rules="nameRules")
+            v-textarea(
+                v-model="study.description"
+                label="Description")
 
-            .field.is-horizontal
-                .field-label.is-normal
-                    label.label Description
-                .field-body
-                    .field
-                        .control.is-expanded
-                            textarea.textarea(placeholder="Study description" v-model="study.description")
-
-            .field.is-horizontal
-                .field-label.is-normal
-                    label.label Questionnaires
-                .field-body
-                    .field
-                        .control.is-expanded
-                            questionnaire-list(:study-id="study.id" :ids="study.questionnaires" @add="addQuestionnaire")
+            .subtitle-1.text-left Questionnaires
+            questionnaire-list(
+                :study-id="study.id"
+                :ids="study.questionnaires"
+                @add="addQuestionnaire")
             
-            .field.is-horizontal
-                .field-label.is-normal
-                .field-body
-                    .field.is-grouped
-                        .control
-                            button.button.is-rounded.is-success(@click="createQuestionnaire()") Create new questionnaire
+            v-btn(
+                block
+                dark
+                color="green"
+                @click="createQuestionnaire()") Create new questionnaire
 
-            hr
-            .buttons.is-right
-                button.button.is-rounded.is-success(:disabled="!isValidStudy" @click="save()") Save
-                button.button.is-rounded.is-danger(@click="cancel()") Cancel
+            v-divider.my-4
+
+            .text-right
+                v-btn.mr-2(
+                    rounded
+                    dark
+                    color="green"
+                    :disabled="!isValidStudy"
+                    @click="save()") Save
+                v-btn(
+                    rounded
+                    dark
+                    color="red"
+                    @click="cancel()") Cancel
 
         div(v-else)
             questionnaire-editor(:study-id="study.id" @save="addQuestionnaire" @cancel="hideEditor")
@@ -62,9 +61,14 @@ export default class StudyEditor extends Vue {
     @Prop({default: null})
     public study!: Study;
 
-    public isAddingQuestionnaire = false;
+    isAddingQuestionnaire = false;
 
-    public get isValidStudy() {
+    nameRules = [
+        (value: string) => !!value || 'Required.',
+        (value: string) => (value && value.length >= 3) || 'Min 3 characters',
+    ];
+
+    get isValidStudy() {
         return this.study.isValid;
     }
 
