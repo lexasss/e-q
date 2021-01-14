@@ -1,4 +1,4 @@
-import Questionnaire from '@/models/questionnaire';
+import StudyResults from '@/models/results';
 import Participant from '@/models/participant';
 import { QuestionType } from '@/models/question';
 
@@ -36,22 +36,13 @@ export default class Study {
             this.name.length > 0;
     }
 
-    public get collectedData(): any {
-        return this.participants.map( p => { return {
-            name: p.name,
-            results: p.questionnaires.map( quest => { return {
-                questionnaire: quest.id,
-                name: quest.name,
-                answers: quest.answers.map( q => { return {
-                    question: q.id,
-                    text: q.name,
-                    answer: q.value,
-                }; }),
-            }; }),
-        }; });
+    public asCSV( sep = '\t' ): string {
+
+        return (new StudyResults( this )).asCSV( sep );
     }
 
     private defaultValue( type: QuestionType ) {
+
         if (type === QuestionType.ChoiceMultiple) {
             return [];
         }

@@ -32,10 +32,11 @@
                             v-model.trim="q.value")
 
                     template(v-else-if="isChoiceOne( q.type )")
-                        v-select.mt-n1.mb-2(
+                        v-select(
                             v-if="q.asDropdownList"
                             v-model="q.value"
-                            :items="q.items")
+                            :items="q.items"
+                            outlined)
                         v-radio-group.mt-0(
                             v-else
                             v-model="q.value")
@@ -45,7 +46,7 @@
                                 :label="option"
                                 :value="option")
 
-                    .mb-3(v-else-if="isChoiceMultiple( q.type )")
+                    .mb-4(v-else-if="isChoiceMultiple( q.type )")
                         v-checkbox.mt-0(
                             v-for="(option, index) in q.items"
                             v-model="q.value"

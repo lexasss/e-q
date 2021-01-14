@@ -1,7 +1,7 @@
 import Question from '@/models/question';
 import Questionnaire from './questionnaire';
 
-class ParticipantQuestionnaire {
+export class ParticipantQuestionnaire {
     public static from( ref: ParticipantQuestionnaire ) {
         const result = new ParticipantQuestionnaire( ref.id, ref.name );
         result.answers = ref.answers

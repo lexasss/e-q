@@ -145,7 +145,7 @@ export default class StudyViewer extends Vue {
     }
 
     save() {
-        IO.download( JSON.stringify( this.study.collectedData ), `${this.study.name}.json` );
+        IO.download( this.study.asCSV(), `${this.study.name}.csv` );
     }
 
     del() {
@@ -176,9 +176,3 @@ export default class StudyViewer extends Vue {
     }
 }
 </script>
-
-<style>
-.v-text-field__details, .v-messages {
-    min-height: 0 !important;
-}
-</style>
