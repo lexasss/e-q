@@ -41,6 +41,7 @@
         template(v-else)
             questionnaire-editor(
                 :study-id="study.id"
+                :is-new="true"
                 @save="addQuestionnaire"
                 @cancel="hideEditor")
 </template>

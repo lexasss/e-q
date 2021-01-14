@@ -56,6 +56,13 @@ const store = new Vuex.Store({
             state.questionnaires.splice( index, 1 );
         },
 
+        replaceQuestionnaire( state, questionnaire: Questionnaire ) {
+            const index = state.questionnaires.findIndex( quest => questionnaire.id === quest.id );
+            if (index >= 0) {
+                state.questionnaires[ index ] = questionnaire;
+            }
+        },
+
         addParticipant( state, data: { participant: Participant, study: Study } ) {
             data.study.participants.push( data.participant );
         },

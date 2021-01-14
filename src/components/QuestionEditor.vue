@@ -42,7 +42,7 @@
                         :min="isScale ? -10 : -1000"
                         :max="params.max"
                         type="number"
-                        style="width: 60px"
+                        style="width: 90px"
                         solo
                         dense)
 
@@ -58,7 +58,7 @@
                         :min="params.min"
                         :max="isScale ? 20 : 1000"
                         type="number"
-                        style="width: 60px"
+                        style="width: 90px"
                         solo
                         dense)
 
@@ -143,6 +143,12 @@ import Question, {
 })
 export default class QuestionEditor extends Vue {
 
+    @Prop({default: null})
+    public reference!: Question;
+
+    @Prop({default: false})
+    public isNew!: boolean;
+
     name = '';
     type = QuestionType.None;
     isRequired = true;
@@ -176,7 +182,6 @@ export default class QuestionEditor extends Vue {
         name: 'scale',
     }];
 
-    maxLength = 0;
     option = '';
 
     nameRules = [
@@ -252,6 +257,10 @@ export default class QuestionEditor extends Vue {
         result.isRequired = this.isRequired;
         result.type = this.type;
 
+        if (!this.isNew) {
+            result.id = this.reference.id;
+        }
+
         return result;
     }
 
@@ -271,6 +280,28 @@ export default class QuestionEditor extends Vue {
             case QuestionType.ChoiceMultiple:
                 this.params.isMultiple = true;
                 break;
+        }
+    }
+
+    created() {
+        if (this.reference) {
+            this.name = this.reference.name;
+            this.type = this.reference.type;
+            this.isRequired = this.reference.isRequired;
+
+            const params = (this.reference as any) as QuestionParams;
+            this.params = {
+                maxLength: params.maxLength ?? this.params.maxLength,
+                min: params.min ?? this.params.min,
+                max: params.max ?? this.params.max,
+                isMultiple: params.isMultiple ?? this.params.isMultiple,
+                asDropdownList: params.asDropdownList ?? this.params.asDropdownList,
+                items: params.items ?? this.params.items,
+                labelLeft: params.labelLeft ?? this.params.labelLeft,
+                labelCenter: params.labelCenter ?? this.params.labelCenter,
+                labelRight: params.labelRight ?? this.params.labelRight,
+                hasSlider: params.hasSlider ?? this.params.hasSlider,
+            };
         }
     }
 }

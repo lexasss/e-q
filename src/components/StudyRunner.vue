@@ -15,18 +15,22 @@
                             v-if="q.maxLength > 0"
                             type="text"
                             outlined
+                            dense
                             :counter="q.maxLength"
                             :maxlength="q.maxLength"
                             v-model.trim="q.value")
                         v-textarea(
                             v-else
                             outlined
+                            auto-grow
+                            rows="3"
                             v-model="q.value")
 
                     template(v-else-if="isNumber( q.type )")
                         v-text-field(
                             type="number"
                             outlined
+                            dense
                             :min="q.min"
                             :max="q.max"
                             v-model.trim="q.value")
@@ -34,9 +38,12 @@
                     template(v-else-if="isChoiceOne( q.type )")
                         v-select(
                             v-if="q.asDropdownList"
-                            v-model="q.value"
+                            dense
+                            outlined
                             :items="q.items"
-                            outlined)
+                            v-model="q.value")
+                            template(v-slot:item="{ item }")
+                                .d-block {{ item }}
                         v-radio-group.mt-0(
                             v-else
                             v-model="q.value")
@@ -49,10 +56,10 @@
                     .mb-4(v-else-if="isChoiceMultiple( q.type )")
                         v-checkbox.mt-0(
                             v-for="(option, index) in q.items"
-                            v-model="q.value"
                             :key="index"
                             :label="option"
-                            :value="option")
+                            :value="option"
+                            v-model="q.value")
 
                     template(v-else-if="isScale( q.type )")
                         v-flex.flex-column
@@ -67,10 +74,10 @@
                                     v-slider(
                                         :min="q.min"
                                         :max="q.max"
-                                        v-model="q.value"
                                         ticks="always"
                                         tick-size="4"
-                                        thumb-label)
+                                        thumb-label
+                                        v-model="q.value")
                                 v-radio-group.my-0(
                                     v-else
                                     row

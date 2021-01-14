@@ -36,6 +36,9 @@ export default class Questionnaire {
         this.name = ref.name;
         this.description = ref.description;
         ref.items.forEach( item => this.items.push( item ));
-        this.study = this.study;
+
+        if (copyID) {
+            this.study = this.study;
+        }
     }
 }

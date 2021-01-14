@@ -1,6 +1,6 @@
 <template lang="pug">
     .white
-        template(v-if="!isAddingQuestion")
+        template(v-if="!isEditingQuestion")
             .text-h5 Questionnaire editor
 
             v-text-field(
@@ -24,11 +24,39 @@
                     v-chip.mt-1(
                         v-for="(item, index) in questionnaire.items"
                         :key="index"
-                        close
                         color="primary"
-                        outlined
-                        @click:close="remove(item)") {{ item.name }}
+                        __unused__close
+                        @__unused__click:close="remove(item)"
+                        outlined) {{ item.name }}
                         .red--text(v-if="item.isRequired") *
+                        v-spacer.ml-4
+                        v-tooltip(bottom)
+                            template(v-slot:activator="{ on: tooltip }")
+                                v-btn(
+                                    icon
+                                    color="primary"
+                                    v-on="{ ...tooltip }"
+                                    @click="edit(item)")
+                                    v-icon() mdi-pencil
+                            span Edit
+                        v-tooltip(bottom)
+                            template(v-slot:activator="{ on: tooltip }")
+                                v-btn(
+                                    icon
+                                    color="primary"
+                                    v-on="{ ...tooltip }"
+                                    @click="clone(item)")
+                                    v-icon() mdi-book-multiple
+                            span Clone
+                        v-tooltip(bottom)
+                            template(v-slot:activator="{ on: tooltip }")
+                                v-btn(
+                                    icon
+                                    color="primary"
+                                    v-on="{ ...tooltip }"
+                                    @click="remove(item)")
+                                    v-icon() mdi-close-circle
+                            span Delete
                 v-subheader.red--text(
                     v-else
                     v-text="'No questions, click the button below to add some.'")
@@ -56,6 +84,8 @@
 
         template(v-else)
             question-editor(
+                :is-new="isNewQuestion"
+                :reference="editingQuestion"
                 @save="addQuestion"
                 @cancel="hideEditor")
 </template>
@@ -83,9 +113,14 @@ export default class QuestionnaireEditor extends Vue {
     @Prop({default: null})
     public reference!: Questionnaire;
 
+    @Prop({default: false})
+    public isNew!: boolean;
+
     questionnaire = new Questionnaire('');
 
-    isAddingQuestion = false;
+    editingQuestion: Question | null = null;
+    isNewQuestion = false;
+    isEditingQuestion = false;
 
     nameRules = [
         (value: string) => !!value || 'Required.',
@@ -108,17 +143,21 @@ export default class QuestionnaireEditor extends Vue {
         return this.studyId === 0;
     }
 
-    addQuestion( question: Question ) {
-        this.isAddingQuestion = false;
-        this.questionnaire.items.push( question );
-    }
-
-    hideEditor() {
-        this.isAddingQuestion = false;
-    }
-
     createNew() {
-        this.isAddingQuestion = true;
+        this.isNewQuestion = true;
+        this.isEditingQuestion = true;
+    }
+
+    edit( question: Question ) {
+        this.isNewQuestion = false;
+        this.editingQuestion = question;
+        this.isEditingQuestion = true;
+    }
+
+    clone( question: Question ) {
+        this.isNewQuestion = true;
+        this.editingQuestion = question;
+        this.isEditingQuestion = true;
     }
 
     remove( question: Question ) {
@@ -126,8 +165,33 @@ export default class QuestionnaireEditor extends Vue {
         this.questionnaire.items.splice( index, 1 );
     }
 
+    addQuestion( question: Question ) {
+        if (this.isNewQuestion) {
+            this.questionnaire.items.push( question );
+        }
+        else {
+            const index = this.questionnaire.items.findIndex( q => q.id === question.id );
+            if (index >= 0) {
+                this.questionnaire.items[ index ] = question;
+            }
+        }
+
+        this.hideEditor();
+    }
+
+    hideEditor() {
+        this.isEditingQuestion = false;
+        this.editingQuestion = null;
+    }
+
     save() {
-        this.$store.commit( 'addQuestionnaire', this.questionnaire );
+        if (this.isNew) {
+            this.$store.commit( 'addQuestionnaire', this.questionnaire );
+        }
+        else {
+            this.$store.commit( 'replaceQuestionnaire', this.questionnaire );
+        }
+
         this.$store.dispatch( 'save' );
 
         this.$emit( 'save', this.questionnaire );
@@ -139,7 +203,7 @@ export default class QuestionnaireEditor extends Vue {
 
     created() {
         if (this.reference) {
-            this.questionnaire.copyFrom( this.reference, false );
+            this.questionnaire.copyFrom( this.reference, !this.isNew );
         }
     }
 

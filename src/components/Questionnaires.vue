@@ -15,16 +15,42 @@
                                 :value="!!quest.study"
                                 :content="studies(quest)")
                                 v-chip(
-                                    :close="isNotUsed(quest)"
+                                    style="min-width: 420px"
                                     color="primary"
                                     :class="{ 'red': isNotUsed(quest) }"
-                                    outlined
-                                    @click:close="del(quest)") {{ quest.name }}
-                                    v-btn.mr-n2(
-                                        icon
-                                        color="primary"
-                                        @click="clone(quest)")
-                                        v-icon(small) mdi-book-multiple
+                                    :__unused__close="isNotUsed(quest)"
+                                    @__unused__click:close="remove(quest)"
+                                    outlined) {{ quest.name }}
+                                    v-spacer.ml-4
+                                    v-tooltip(bottom)
+                                        template(v-slot:activator="{ on: tooltip }")
+                                            v-btn(
+                                                icon
+                                                :disabled="hasParticipants(quest)"
+                                                color="primary"
+                                                v-on="{ ...tooltip }"
+                                                @click="edit(quest)")
+                                                v-icon() mdi-pencil
+                                        span Edit
+                                    v-tooltip(bottom)
+                                        template(v-slot:activator="{ on: tooltip }")
+                                            v-btn(
+                                                icon
+                                                color="primary"
+                                                v-on="{ ...tooltip }"
+                                                @click="clone(quest)")
+                                                v-icon() mdi-book-multiple
+                                        span Clone
+                                    v-tooltip(bottom)
+                                        template(v-slot:activator="{ on: tooltip }")
+                                            v-btn(
+                                                icon
+                                                :disabled="!isNotUsed(quest)"
+                                                color="primary"
+                                                v-on="{ ...tooltip }"
+                                                @click="remove(quest)")
+                                                v-icon() mdi-close-circle
+                                        span Delete
             v-subheader.red--text(
                 v-else
                 v-text="'No questionnaires'")
@@ -35,13 +61,14 @@
                 @click="createNew()") Create new
 
         v-dialog(
-            v-if="isAddingQuestionnaire"
+            v-if="isEditingQuestionnaire"
             :value="true"
             persistent
             max-width="640px")
             questionnaire-editor.pa-4(
                 :study-id="0"
                 :reference="reference"
+                :is-new="isCloning"
                 @save="hideEditor"
                 @cancel="hideEditor")
 </template>
@@ -61,7 +88,8 @@ import Study from '@/models/study';
 })
 export default class Questionnaires extends Vue {
 
-    isAddingQuestionnaire = false;
+    isEditingQuestionnaire = false;
+    isCloning = false;
     reference: Questionnaire | null = null;
 
     studies( quest: Questionnaire ) {
@@ -85,16 +113,34 @@ export default class Questionnaires extends Vue {
         }
     }
 
+    hasParticipants( quest: Questionnaire ) {
+        return this.$store.state.studies.some( (study: Study) => {
+            return study.questionnaires.some( id => id === quest.id ) && study.participants.length > 0;
+        });
+    }
+
     cannotUse( quest: Questionnaire ) {
         if (quest.study !== 0) {
-            return !this.$store.state.studies.find( (item: Study) => item.id === quest.study );
+            return !this.$store.state.studies.find( (study: Study) => study.id === quest.study );
         }
         else {
             return false;
         }
     }
 
-    del( quest: Questionnaire ) {
+    edit( quest: Questionnaire ) {
+        this.isCloning = false;
+        this.reference = quest;
+        this.isEditingQuestionnaire = true;
+    }
+
+    clone( quest: Questionnaire ) {
+        this.isCloning = true;
+        this.reference = quest;
+        this.isEditingQuestionnaire = true;
+    }
+
+    remove( quest: Questionnaire ) {
         let isAllowed = true;
         if (quest.study === 0) {
             isAllowed = window.confirm( 'Are you sure to delete this questionnaire?' );
@@ -106,17 +152,12 @@ export default class Questionnaires extends Vue {
         }
     }
 
-    clone( quest: Questionnaire ) {
-        this.reference = quest;
-        this.isAddingQuestionnaire = true;
-    }
-
     createNew() {
-        this.isAddingQuestionnaire = true;
+        this.isEditingQuestionnaire = true;
     }
 
     hideEditor() {
-        this.isAddingQuestionnaire = false;
+        this.isEditingQuestionnaire = false;
         this.reference = null;
     }
 }
