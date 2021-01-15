@@ -1,6 +1,6 @@
 <template lang="pug">
     .white
-        template(v-if="!isAddingQuestionnaire")
+        template(v-if="!isEditingQuestionnaire")
             .text-h5 Study editor
 
             v-text-field(
@@ -15,7 +15,8 @@
             questionnaire-list(
                 :study-id="study.id"
                 :ids="study.questionnaires"
-                @add="addQuestionnaire")
+                @add="addQuestionnaire"
+                @edit="editQuestionnaire")
             
             v-btn(
                 block
@@ -40,8 +41,9 @@
 
         template(v-else)
             questionnaire-editor(
-                :study-id="study.id"
-                :is-new="true"
+                :study-id="canBePrivate ? study.id : 0"
+                :reference="editingQuestionnaire"
+                :is-new="!editingQuestionnaire"
                 @save="addQuestionnaire"
                 @cancel="hideEditor")
 </template>
@@ -66,7 +68,8 @@ export default class StudyEditor extends Vue {
     @Prop({default: null})
     public study!: Study;
 
-    isAddingQuestionnaire = false;
+    isEditingQuestionnaire = false;
+    editingQuestionnaire: Questionnaire | null = null;
 
     nameRules = [
         (value: string) => !!value || 'Required.',
@@ -77,17 +80,32 @@ export default class StudyEditor extends Vue {
         return this.study.isValid;
     }
 
+    get canBePrivate() {
+        return this.editingQuestionnaire?.study ?? true;
+    }
+
+    editQuestionnaire( questionnaire: Questionnaire ) {
+        if (questionnaire) {
+            this.editingQuestionnaire = questionnaire;
+            this.isEditingQuestionnaire = true;
+        }
+    }
+
     createQuestionnaire() {
-        this.isAddingQuestionnaire = true;
+        this.isEditingQuestionnaire = true;
     }
 
     addQuestionnaire(questionnaire: Questionnaire) {
-        this.isAddingQuestionnaire = false;
-        this.study.questionnaires.push( questionnaire.id );
+        if (!this.editingQuestionnaire) {
+            this.study.questionnaires.push( questionnaire.id );
+        }
+
+        this.hideEditor();
     }
 
     hideEditor() {
-        this.isAddingQuestionnaire = false;
+        this.editingQuestionnaire = null;
+        this.isEditingQuestionnaire = false;
     }
 
     save() {

@@ -42,6 +42,13 @@ const store = new Vuex.Store({
             state.studies.splice( index, 1 );
         },
 
+        replaceStudy( state, study: Study ) {
+            const index = state.studies.findIndex( item => item.id === study.id );
+            if (index >= 0) {
+                state.studies[ index ] = study;
+            }
+        },
+
         setQuestionnaires( state, questionnaires: Questionnaire[] ) {
             state.questionnaires = [];
             questionnaires.forEach( item => state.questionnaires.push( Questionnaire.from( item ) ));
@@ -57,7 +64,7 @@ const store = new Vuex.Store({
         },
 
         replaceQuestionnaire( state, questionnaire: Questionnaire ) {
-            const index = state.questionnaires.findIndex( quest => questionnaire.id === quest.id );
+            const index = state.questionnaires.findIndex( item => item.id === questionnaire.id );
             if (index >= 0) {
                 state.questionnaires[ index ] = questionnaire;
             }

@@ -38,7 +38,7 @@ export default class Questionnaire {
         ref.items.forEach( item => this.items.push( item ));
 
         if (copyID) {
-            this.study = this.study;
+            this.study = ref.study;
         }
     }
 }

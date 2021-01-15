@@ -22,10 +22,15 @@
                                 @click="askName") Run
                             v-btn.mr-2(
                                 color="primary"
-                                @click="clone") Clone
+                                @click="save") Save to file
+                            v-spacer
                             v-btn.mr-2(
                                 color="primary"
-                                @click="save") Save to file
+                                :disabled="!!study.participants.length"
+                                @click="edit") Edit
+                            v-btn.mr-2(
+                                color="primary"
+                                @click="clone") Clone
                             v-spacer
                             v-btn.mr-2(
                                 dark
@@ -140,12 +145,16 @@ export default class StudyViewer extends Vue {
         this.participantName = '';
     }
 
+    save() {
+        IO.download( this.study.asCSV(), `${this.study.name}.csv` );
+    }
+
     clone() {
         this.$emit( 'clone', this.study );
     }
 
-    save() {
-        IO.download( this.study.asCSV(), `${this.study.name}.csv` );
+    edit() {
+        this.$emit( 'edit', this.study );
     }
 
     del() {

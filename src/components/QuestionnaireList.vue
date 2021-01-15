@@ -8,12 +8,33 @@
                     v-chip.mr-2(
                         v-for="(id, index) in ids"
                         :key="index"
-                        close
                         draggable
                         color="primary"
                         outlined
                         :class="{ 'font-italic': isPrivate(id) }"
-                        @click:close="remove(id)") {{ getName(id) }}
+                        __unused__close
+                        @__unused__click:close="remove(id)") {{ getName(id) }}
+                        v-spacer.ml-4
+                        v-tooltip(bottom)
+                            template(v-slot:activator="{ on: tooltip }")
+                                v-btn(
+                                    icon
+                                    :disabled="hasParticipants(id)"
+                                    color="primary"
+                                    v-on="{ ...tooltip }"
+                                    @click="edit(id)")
+                                    v-icon() mdi-pencil
+                            span Edit
+                        v-tooltip(bottom)
+                            template(v-slot:activator="{ on: tooltip }")
+                                v-btn(
+                                    icon
+                                    color="primary"
+                                    v-on="{ ...tooltip }"
+                                    @click="remove(id)")
+                                    v-icon() mdi-close-circle
+                            span Delete
+
         v-subheader.red--text(v-else) No questionnaires, select some existing from the list below or create a new one. 
 
         .d-flex
@@ -56,6 +77,10 @@ export default class QuestionnaireList extends Vue {
         });
     }
 
+    getQuestionnaire( id: number ) {
+        return this.$store.state.questionnaires.find( (item: Questionnaire) => item.id === id ) as Questionnaire;
+    }
+
     addQuestionnaire( questionnaire: Questionnaire ) {
         if (questionnaire) {
             this.$emit('add', questionnaire);
@@ -67,19 +92,28 @@ export default class QuestionnaireList extends Vue {
     }
 
     isPrivate( id: number ) {
-        const questionnaire = this.$store.state.questionnaires.find( (item: Questionnaire) => {
-            return item.id === id; }) as Questionnaire;
+        const questionnaire = this.getQuestionnaire( id );
         return !!questionnaire.study;
     }
 
     getName( id: number ) {
-        const questionnaire = this.$store.state.questionnaires.find( (item: Questionnaire) => {
-            return item.id === id; }) as Questionnaire;
+        const questionnaire = this.getQuestionnaire( id );
         return questionnaire.name;
     }
 
-    remove( questID: number ) {
-        const index = this.ids.findIndex( id => id === questID );
+    hasParticipants( id: number ) {
+        return this.$store.state.studies.some( (item: Study) => {
+            return item.questionnaires.indexOf( id ) >= 0 && item.participants.length > 0;
+        });
+    }
+
+    edit( id: number ) {
+        const questionnaire = this.getQuestionnaire( id );
+        this.$emit('edit', questionnaire);
+    }
+
+    remove( id: number ) {
+        const index = this.ids.findIndex( item => item === id );
         this.ids.splice( index, 1 );
     }
 

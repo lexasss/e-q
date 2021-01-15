@@ -15,51 +15,51 @@
                 v-model="isPublic"
                 label="public")
 
-            v-list(dense)
-                .subtitle-1.text-left Questions
-                draggable.d-flex.flex-column(
+            .subtitle-1.text-left Questions
+                v-list(
                     v-if="questionnaire.items.length"
-                    :list="questionnaire.items"
-                    @change="onSwapped")
-                    v-chip.mt-1(
-                        v-for="(item, index) in questionnaire.items"
-                        :key="index"
-                        color="primary"
-                        __unused__close
-                        @__unused__click:close="remove(item)"
-                        outlined) {{ item.name }}
-                        .red--text(v-if="item.isRequired") *
-                        v-spacer.ml-4
-                        v-tooltip(bottom)
-                            template(v-slot:activator="{ on: tooltip }")
-                                v-btn(
-                                    icon
-                                    color="primary"
-                                    v-on="{ ...tooltip }"
-                                    @click="edit(item)")
-                                    v-icon() mdi-pencil
-                            span Edit
-                        v-tooltip(bottom)
-                            template(v-slot:activator="{ on: tooltip }")
-                                v-btn(
-                                    icon
-                                    color="primary"
-                                    v-on="{ ...tooltip }"
-                                    @click="clone(item)")
-                                    v-icon() mdi-book-multiple
-                            span Clone
-                        v-tooltip(bottom)
-                            template(v-slot:activator="{ on: tooltip }")
-                                v-btn(
-                                    icon
-                                    color="primary"
-                                    v-on="{ ...tooltip }"
-                                    @click="remove(item)")
-                                    v-icon() mdi-close-circle
-                            span Delete
-                v-subheader.red--text(
-                    v-else
-                    v-text="'No questions, click the button below to add some.'")
+                    dense)
+                    draggable.d-flex.flex-column(
+                        :list="questionnaire.items"
+                        @change="onSwapped")
+                        v-chip.mt-1(
+                            v-for="(item, index) in questionnaire.items"
+                            :key="index"
+                            color="primary"
+                            __unused__close
+                            @__unused__click:close="remove(item)"
+                            outlined) {{ item.name }}
+                            .red--text(v-if="item.isRequired") *
+                            v-spacer.ml-4
+                            v-tooltip(bottom)
+                                template(v-slot:activator="{ on: tooltip }")
+                                    v-btn(
+                                        icon
+                                        color="primary"
+                                        v-on="{ ...tooltip }"
+                                        @click="edit(item)")
+                                        v-icon() mdi-pencil
+                                span Edit
+                            v-tooltip(bottom)
+                                template(v-slot:activator="{ on: tooltip }")
+                                    v-btn(
+                                        icon
+                                        color="primary"
+                                        v-on="{ ...tooltip }"
+                                        @click="clone(item)")
+                                        v-icon() mdi-book-multiple
+                                span Clone
+                            v-tooltip(bottom)
+                                template(v-slot:activator="{ on: tooltip }")
+                                    v-btn(
+                                        icon
+                                        color="primary"
+                                        v-on="{ ...tooltip }"
+                                        @click="remove(item)")
+                                        v-icon() mdi-close-circle
+                                span Delete
+                v-subheader.text-center(v-else)
+                    .red--text No questions, click the button below to add some.
             
             v-btn(
                 block
@@ -185,11 +185,11 @@ export default class QuestionnaireEditor extends Vue {
     }
 
     save() {
-        if (this.isNew) {
-            this.$store.commit( 'addQuestionnaire', this.questionnaire );
+        if (!this.isNew && !!this.reference) {
+            this.$store.commit( 'replaceQuestionnaire', this.questionnaire );
         }
         else {
-            this.$store.commit( 'replaceQuestionnaire', this.questionnaire );
+            this.$store.commit( 'addQuestionnaire', this.questionnaire );
         }
 
         this.$store.dispatch( 'save' );

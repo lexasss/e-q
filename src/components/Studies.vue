@@ -8,7 +8,8 @@
                 v-text="study.name"
                 :key="study.id"
                 @click="show(study)")
-        v-subheader.red--text(v-else) No studies, click the button below to create a new one.
+        v-subheader.justify-center(v-else)
+            .red--text No studies created yet, click the button below to create a new one.
 
         v-btn.mt-4(
             dark
@@ -23,7 +24,7 @@
             study-editor.pa-4(
                 :study="editedStudy"
                 @save="save"
-                @cancel="cancel")
+                @cancel="hideEditor")
 </template>
 
 <script lang="ts">
@@ -44,24 +45,40 @@ import Study from '@/models/study';
 })
 export default class Studies extends Vue {
 
+    isNew = false;
     editedStudy: Study | null = null;
 
+    public edit( study: Study ) {
+        this.isNew = false;
+        this.editedStudy = Study.from( study );
+    }
+
     public clone( study: Study ) {
+        this.isNew = true;
         this.editedStudy = Study.from( study, true );
     }
 
     createNew() {
+        this.isNew = true;
         this.editedStudy = new Study();
     }
 
     save( study: Study ) {
-        this.editedStudy = null;
-        this.$store.commit( 'addStudy', study );
+        if (this.isNew) {
+            this.$store.commit( 'addStudy', study );
+        }
+        else {
+            this.$store.commit( 'replaceStudy', study );
+        }
+
         this.$store.dispatch( 'save' );
+
+        this.hideEditor();
     }
 
-    cancel() {
+    hideEditor() {
         this.editedStudy = null;
+        this.$emit( 'update' );
     }
 
     show( study: Study ) {
