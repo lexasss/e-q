@@ -20,6 +20,27 @@
 
             v-subheader offline questionnaire
 
+            v-tooltip(left)
+                template(v-slot:activator="{ on: tooltip }")
+                    v-btn(
+                        icon
+                        @click="exportData()")
+                        v-icon mdi-export
+                span Export
+            v-tooltip(left)
+                template(v-slot:activator="{ on: tooltip }")
+                    input(
+                        ref="fileUpload"
+                        type="file"
+                        accept=".json" 
+                        hidden
+                        @change="importFile")
+                    v-btn(
+                        icon
+                        @click="importData()")
+                        v-icon mdi-import
+                span Import
+
         v-main(:class="{ 'pa-0': isRunningStudy }")
             v-container(fluid)
                 template(v-if="!selectedStudy")
@@ -49,6 +70,13 @@
             .py-2.blue-lighten-4--text(dark)
                 .text-center {{ new Date().getFullYear() }} — Oleg Špakov, Tampere University
                 .tip(v-if="isAlertHidden") #{tip}
+
+        v-dialog(
+            :value="isFileAlert"
+            width="500")
+            v-alert.ma-0(
+                type="error"
+                transition="scale-transition") Cannot load the file
 </template>
 
 <script lang="ts">
@@ -61,6 +89,8 @@ import StudyViewer from '@/components/StudyViewer.vue';
 import Study from '@/models/study';
 import Questionnaire from '@/models/questionnaire';
 
+import IO from '@/services/io';
+
 @Component({
     components: {
         Studies,
@@ -72,6 +102,7 @@ export default class App extends Vue {
 
     selectedStudy: Study | null = null;
     isAlertHidden = false;
+    isFileAlert = false;
 
     get isRunningStudy() {
         return this.$store.state.isRunningStudy;
@@ -103,6 +134,36 @@ export default class App extends Vue {
         this.$nextTick().then(() => {
             (this.$refs.questionnaires as Questionnaires).$forceUpdate();
         });
+    }
+
+    exportData() {
+        const { studies, questionnaires } = this.$store.state;
+        IO.download( JSON.stringify( { studies, questionnaires } ), 'e-q.json' );
+    }
+
+    importData() {
+        const fileInputEl = this.$refs.fileUpload as HTMLInputElement;
+        fileInputEl.click();
+    }
+
+    importFile( e: Event ) {
+        const file = (e.target as HTMLInputElement).files?.item(0);
+        if (file) {
+            IO.read( file )
+                .then( (data: any) => {
+                    if (data.studies !== undefined && data.questionnaires !== undefined) {
+                        this.$store.commit( 'setStudies', data.studies );
+                        this.$store.commit( 'setQuestionnaires', data.questionnaires );
+                        this.$store.dispatch( 'save' );
+                    }
+                    else {
+                        throw new Error();
+                    }
+                })
+                .catch(() => {
+                    this.isFileAlert = true;
+                });
+        }
     }
 
     created() {
