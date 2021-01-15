@@ -6,7 +6,7 @@ import store from '@/services/storage';
 
 import vuetify from './plugins/vuetify';
 
-import './registerServiceWorker'
+import './registerServiceWorker';
 
 Vue.config.productionTip = false;
 
