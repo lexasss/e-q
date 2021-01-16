@@ -63,20 +63,20 @@
             padless
             dark)
             v-alert.full-width.ma-0(
-                v-if="!isAlertHidden"
+                v-if="isAppWarningVisible"
                 dismissible
                 type="warning"
                 dense) #{tip}
             .py-2.blue-lighten-4--text(dark)
                 .text-center {{ new Date().getFullYear() }} — Oleg Špakov, Tampere University
-                .tip(v-if="isAlertHidden") #{tip}
+                .tip(v-if="!isAppWarningVisible") #{tip}
 
         v-dialog(
-            :value="isFileAlert"
+            v-model="isAlertVisible"
             width="500")
             v-alert.ma-0(
                 type="error"
-                transition="scale-transition") Cannot load the file
+                transition="scale-transition") {{ alertMessage }}
 </template>
 
 <script lang="ts">
@@ -101,8 +101,10 @@ import IO from '@/services/io';
 export default class App extends Vue {
 
     selectedStudy: Study | null = null;
-    isAlertHidden = false;
-    isFileAlert = false;
+    isAppWarningVisible = true;
+
+    isAlertVisible = false;
+    alertMessage = '';
 
     get isRunningStudy() {
         return this.$store.state.isRunningStudy;
@@ -138,7 +140,13 @@ export default class App extends Vue {
 
     exportData() {
         const { studies, questionnaires } = this.$store.state;
-        IO.download( JSON.stringify( { studies, questionnaires } ), 'e-q.json' );
+        if (studies.length > 0 || questionnaires.length > 0) {
+            IO.download( JSON.stringify( { studies, questionnaires } ), 'e-q.json' );
+        }
+        else {
+            this.alertMessage = 'No data to save';
+            this.isAlertVisible = true;
+        }
     }
 
     importData() {
@@ -161,7 +169,8 @@ export default class App extends Vue {
                     }
                 })
                 .catch(() => {
-                    this.isFileAlert = true;
+                    this.alertMessage = 'Cannot load the file';
+                    this.isAlertVisible = true;
                 });
         }
     }
@@ -169,7 +178,7 @@ export default class App extends Vue {
     created() {
         this.$store.dispatch( 'connect', 'local' ).then(() => {
             if (this.$store.state.studies.length || this.$store.state.questionnaires.length) {
-                this.isAlertHidden = true;
+                this.isAppWarningVisible = false;
             }
         });
     }
