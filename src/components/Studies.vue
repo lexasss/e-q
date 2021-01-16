@@ -2,12 +2,16 @@
     .studies
         .text-h4.my-4 Studies
 
-        .d-flex.flex-column(v-if="!!$store.state.studies.length")
-            v-btn(
+        v-list(
+            v-if="$store.state.studies.length"
+            dense)
+            v-list-item(
                 v-for="study in $store.state.studies"
-                v-text="study.name"
-                :key="study.id"
-                @click="show(study)")
+                :key="study.id")
+                v-list-item-content.py-0
+                    v-btn(
+                        v-text="study.name"
+                        @click="show(study)")
         v-subheader.justify-center(v-else)
             .red--text No studies created yet, click the button below to create a new one.
 

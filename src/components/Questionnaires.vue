@@ -55,7 +55,7 @@
         v-subheader.justify-center(v-else)
             .red--text No questionnaires created yet.
 
-        v-btn(
+        v-btn.mt-4(
             dark
             color="green"
             @click="createNew()") Create new
