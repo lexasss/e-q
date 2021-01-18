@@ -14,32 +14,54 @@
                     src="@/assets/logo.png"
                     transition="scale-transition"
                     width="40")
-                v-toolbar-title E-Q
+                //- v-toolbar-title E-Q
+
+            v-subheader Electronic offline questionnaire
 
             v-spacer
 
-            v-subheader offline questionnaire
+            //- v-tooltip(left)
+            //-     template(v-slot:activator="{ on: tooltip }")
+            //-         v-btn(
+            //-             icon
+            //-             @click="exportData()")
+            //-             v-icon mdi-export
+            //-     span Export
+            //- v-tooltip(left)
+            //-     template(v-slot:activator="{ on: tooltip }")
+            //-         input(
+            //-             ref="fileUpload"
+            //-             type="file"
+            //-             accept=".json" 
+            //-             hidden
+            //-             @change="importFile")
+            //-         v-btn(
+            //-             icon
+            //-             @click="importData()")
+            //-             v-icon mdi-import
+            //-     span Import
 
-            v-tooltip(left)
-                template(v-slot:activator="{ on: tooltip }")
-                    v-btn(
-                        icon
-                        @click="exportData()")
-                        v-icon mdi-export
-                span Export
-            v-tooltip(left)
-                template(v-slot:activator="{ on: tooltip }")
-                    input(
-                        ref="fileUpload"
-                        type="file"
-                        accept=".json" 
-                        hidden
-                        @change="importFile")
-                    v-btn(
-                        icon
-                        @click="importData()")
-                        v-icon mdi-import
-                span Import
+
+            v-menu(left)
+                template(v-slot:activator="{ on, attrs }")
+                    v-btn(dark icon v-bind="attrs" v-on="on")
+                        v-icon mdi-dots-vertical
+
+                v-list
+                    v-list-item(@click="exportData()")
+                        v-list-item-icon
+                            v-icon mdi-export
+                        v-list-item-title Export data
+                    v-list-item(@click="importData()")
+                        v-list-item-icon
+                            v-icon mdi-import
+                        v-list-item-title Import data
+                        input(
+                            ref="fileUpload"
+                            type="file"
+                            accept=".json" 
+                            hidden
+                            @change="importFile")
 
         v-main(:class="{ 'pa-0': isRunningStudy }")
             v-container(fluid)
