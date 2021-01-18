@@ -185,15 +185,15 @@ export default class App extends Vue {
         });
 
         navigator.storage.persisted().then( granted => {
-            if (!granted) {
-                this.alertMessage = 'It is recommended to allow storing data persistently.';
-                this.isAlertVisible = true;
-
+            if (granted) {
+                this.isAppWarningVisible = false;
+            }
+            else {
                 return navigator.storage.persisted();
             }
         }).then( granted => {
             if (granted) {
-                this.isAlertVisible = true;
+                this.isAppWarningVisible = false;
             }
         });
     }
