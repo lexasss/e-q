@@ -68,7 +68,7 @@
                 type="warning"
                 dense) #{tip}
             .py-2.blue-lighten-4--text(dark)
-                .text-center {{ new Date().getFullYear() }} — Oleg Špakov, Tampere University
+                .text-center {{ new Date().getFullYear() }} — Oleg Špakov, Tampere University, v{{ VERSION }}
                 .tip(v-if="!isAppWarningVisible") #{tip}
 
         v-dialog(
@@ -99,6 +99,8 @@ import IO from '@/services/io';
     },
 })
 export default class App extends Vue {
+
+    readonly VERSION = process.env.PACKAGE_VERSION;
 
     selectedStudy: Study | null = null;
     isAppWarningVisible = true;
@@ -179,6 +181,19 @@ export default class App extends Vue {
         this.$store.dispatch( 'connect', 'local' ).then(() => {
             if (this.$store.state.studies.length || this.$store.state.questionnaires.length) {
                 this.isAppWarningVisible = false;
+            }
+        });
+
+        navigator.storage.persisted().then( granted => {
+            if (!granted) {
+                this.alertMessage = 'It is recommended to allow storing data persistently.';
+                this.isAlertVisible = true;
+
+                return navigator.storage.persisted();
+            }
+        }).then( granted => {
+            if (granted) {
+                this.isAlertVisible = true;
             }
         });
     }
