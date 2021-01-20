@@ -77,7 +77,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import StudyRunner from '@/components/StudyRunner.vue';
+const studyRunner = () => import(/* webpackPrefetch: true */ /* webpackChunkName: "components" */ '@/components/StudyRunner.vue');
 
 import Study from '@/models/study';
 import Participant from '@/models/participant';
@@ -88,7 +88,7 @@ import store from '@/services/storage';
 
 @Component({
     components: {
-        'study-runner': StudyRunner,
+        studyRunner,
     },
 })
 export default class StudyViewer extends Vue {

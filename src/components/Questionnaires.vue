@@ -76,14 +76,14 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import QuestionnaireEditor from '@/components/QuestionnaireEditor.vue';
+const questionnaireEditor = () => import(/* webpackPrefetch: true */ /* webpackChunkName: "components" */ '@/components/QuestionnaireEditor.vue');
 
 import Questionnaire from '@/models/questionnaire';
 import Study from '@/models/study';
 
 @Component({
     components: {
-        'questionnaire-editor': QuestionnaireEditor,
+        questionnaireEditor,
     },
 })
 export default class Questionnaires extends Vue {

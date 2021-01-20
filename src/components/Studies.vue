@@ -33,19 +33,15 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-// import { mapActions } from 'vuex';
 
-import StudyEditor from '@/components/StudyEditor.vue';
+const studyEditor = () => import(/* webpackPrefetch: true */ /* webpackChunkName: "components" */ '@/components/StudyEditor.vue');
 
 import Study from '@/models/study';
 
 @Component({
     components: {
-        'study-editor': StudyEditor,
+        studyEditor,
     },
-    // methods: {
-    //    ...mapActions(['addTodo'])
-    // },
 })
 export default class Studies extends Vue {
 

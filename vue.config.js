@@ -5,6 +5,8 @@ const packageJson = fs.readFileSync( './package.json' );
 const version = JSON.parse( packageJson ).version || 0;
 
 module.exports = {
+    productionSourceMap: false,
+
     configureWebpack: {
         plugins: [
             new webpack.DefinePlugin({
@@ -14,12 +16,15 @@ module.exports = {
             }),
         ],
     },    
+
     transpileDependencies: [
         'vuetify',
     ],
+
     publicPath: process.env.NODE_ENV === 'production'
         ? '/e-q/'
         : '/',
+
     pwa: {
         assetsVersion: version,
         themeColor: '#1976D2',

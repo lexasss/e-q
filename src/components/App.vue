@@ -106,7 +106,8 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import Studies from '@/components/Studies.vue';
 import Questionnaires from '@/components/Questionnaires.vue';
-import StudyViewer from '@/components/StudyViewer.vue';
+
+const studyViewer = () => import(/* webpackPrefetch: true */ /* webpackChunkName: "components" */ '@/components/StudyViewer.vue');
 
 import Study from '@/models/study';
 import Questionnaire from '@/models/questionnaire';
@@ -117,7 +118,7 @@ import IO from '@/services/io';
     components: {
         Studies,
         Questionnaires,
-        'study-viewer': StudyViewer,
+        studyViewer,
     },
 })
 export default class App extends Vue {

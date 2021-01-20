@@ -94,14 +94,14 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
 
-import QuestionEditor from '@/components/QuestionEditor.vue';
+const questionEditor = () => import(/* webpackPrefetch: true */ /* webpackChunkName: "components" */ '@/components/QuestionEditor.vue');
 
 import Questionnaire from '@/models/questionnaire';
 import Question from '@/models/question';
 
 @Component({
     components: {
-        'question-editor': QuestionEditor,
+        questionEditor,
         draggable,
     },
 })
