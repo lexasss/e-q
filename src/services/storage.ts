@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import User from '@/models/user';
 import Study from '@/models/study';
 import Participant from '@/models/participant';
 import Questionnaire from '@/models/questionnaire';
@@ -15,6 +16,7 @@ interface StorageData {
 
 interface StorageState extends StorageData {
     isConnected: boolean;
+    user?: User;
 }
 
 let url: string;
@@ -22,12 +24,17 @@ let url: string;
 const store = new Vuex.Store({
     state: {
         isConnected: false,
+        user: undefined,
         isRunningStudy: false,
         studies: [] as Study[],
         questionnaires: [] as Questionnaire[],
     } as StorageState,
 
     mutations: {
+        setUser( state, user: User ) {
+            state.user = user;
+        },
+
         setStudies( state, studies: Study[] ) {
             state.studies = [];
             studies.forEach( item => state.studies.push( Study.from( item ) ));

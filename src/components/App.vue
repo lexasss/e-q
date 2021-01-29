@@ -20,13 +20,14 @@
 
             v-spacer
 
-            //- v-tooltip(left)
-            //-     template(v-slot:activator="{ on: tooltip }")
-            //-         v-btn(
-            //-             icon
-            //-             @click="exportData()")
-            //-             v-icon mdi-export
-            //-     span Export
+            template(v-if="user")
+                v-subheader {{ user.name }}
+            v-btn(
+                v-else
+                icon
+                @click="signIn()")
+                v-icon mdi-login
+
             //- v-tooltip(left)
             //-     template(v-slot:activator="{ on: tooltip }")
             //-         input(
@@ -113,6 +114,7 @@ import Study from '@/models/study';
 import Questionnaire from '@/models/questionnaire';
 
 import IO from '@/services/io';
+import OAuth from '@/services/auth';
 
 @Component({
     components: {
@@ -133,6 +135,10 @@ export default class App extends Vue {
 
     get isRunningStudy() {
         return this.$store.state.isRunningStudy;
+    }
+
+    get user() {
+        return this.$store.state.user;
     }
 
     selectStudy( study: Study ) {
@@ -200,13 +206,19 @@ export default class App extends Vue {
         }
     }
 
-    created() {
+    signIn() {
+        OAuth.signIn();
+    }
+
+    async created() {
+        // connect to the local storage
         this.$store.dispatch( 'connect', 'local' ).then(() => {
             if (this.$store.state.studies.length || this.$store.state.questionnaires.length) {
                 this.isAppWarningVisible = false;
             }
         });
 
+        // This is probably never used
         navigator.storage.persisted().then( granted => {
             if (granted) {
                 this.isAppWarningVisible = false;
@@ -219,6 +231,18 @@ export default class App extends Vue {
                 this.isAppWarningVisible = false;
             }
         });
+
+        // Handle Google server response, if any
+        try {
+            const profile = await OAuth.load();
+            if (profile) {
+                this.$store.commit( 'setUser', profile );
+                this.$store.dispatch( 'save' );
+            }
+        }
+        catch (error) {
+            console.log( error );
+        }
     }
 }
 </script>
